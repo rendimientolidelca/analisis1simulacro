@@ -262,6 +262,283 @@
 
     .empty-state { padding: 30px; color: var(--muted); text-align: center; }
 
+    .interactive-hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .student-report-trigger {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 18px;
+    }
+
+    .student-report-trigger h3 {
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .student-report-trigger p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .primary-btn {
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.18s ease, filter 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover { transform: translateY(-1px); filter: brightness(1.02); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(12px, 3vw, 28px);
+      background: rgba(16, 24, 39, 0.58);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      width: min(980px, 100%);
+      max-height: min(86vh, 820px);
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      overflow: hidden;
+      border-radius: 26px;
+      background: rgba(255,255,255,0.98);
+      border: 1px solid rgba(234, 223, 190, 0.95);
+      box-shadow: 0 30px 90px rgba(16, 24, 39, 0.28);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffef8, #fffaf0);
+    }
+
+    .modal-title h3 {
+      font-size: clamp(18px, 3vw, 24px);
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      color: #171a20;
+    }
+
+    .modal-title p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .modal-close {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 14px;
+      background: #fff1cc;
+      color: var(--accent-dark);
+      font-size: 22px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .modal-toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .modal-search {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .modal-search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .modal-body {
+      overflow: auto;
+      padding: 18px 24px 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-stat {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fffaf0;
+    }
+
+    .modal-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .modal-stat strong {
+      display: block;
+      margin-top: 8px;
+      color: #171a20;
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .modal-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-table {
+      min-width: 760px;
+    }
+
+    .student-report {
+      display: grid;
+      gap: 16px;
+    }
+
+    .report-hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #fffaf0, #fff1cc);
+      border: 1px solid var(--line);
+    }
+
+    .report-hero h4 {
+      font-size: 24px;
+      letter-spacing: -0.04em;
+      color: #171a20;
+    }
+
+    .report-hero p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .report-score {
+      display: grid;
+      place-items: center;
+      width: 88px;
+      height: 88px;
+      border-radius: 28px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+      color: var(--accent);
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .report-card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .report-card span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .report-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 22px;
+      color: #171a20;
+    }
+
+    .part-report-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .part-report-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 54px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .clickable-list-row {
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .clickable-list-row:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
     @media (max-width: 1180px) {
       .grid-kpis, .summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .charts-grid, .charts-grid.equal, .analysis-grid { grid-template-columns: 1fr; }
@@ -331,6 +608,18 @@
 
     @media (max-width: 640px) {
       :root { --radius: 18px; }
+      .student-report-trigger { grid-template-columns: 1fr; }
+      .primary-btn { width: 100%; }
+      .modal-overlay { align-items: flex-end; padding: 0; }
+      .modal { width: 100%; max-height: 92vh; border-radius: 24px 24px 0 0; }
+      .modal-header { padding: 18px 16px 14px; }
+      .modal-toolbar { padding: 14px 16px; }
+      .modal-body { padding: 14px 16px 18px; }
+      .modal-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .report-hero { grid-template-columns: 1fr; }
+      .report-score { width: 76px; height: 76px; border-radius: 24px; font-size: 26px; }
+      .report-grid { grid-template-columns: 1fr; }
+      .part-report-row { grid-template-columns: 78px 1fr 42px; gap: 8px; }
       .main { padding: 14px; }
       .sidebar { padding: 14px; }
       .toggle-btn { width: 42px; height: 42px; flex: 0 0 auto; }
@@ -478,6 +767,13 @@
       </section>
 
       <section class="view" id="view-ranking">
+        <section class="card student-report-trigger">
+          <div>
+            <h3>Reporte individual por estudiante</h3>
+            <p>Abre un buscador central para consultar todos los puntajes, fortalezas, áreas de mejora y análisis individual.</p>
+          </div>
+          <button class="primary-btn" id="openStudentReportBtn">Buscar estudiante</button>
+        </section>
         <section class="analysis-grid">
           <article class="card panel"><h3>Top 10 estudiantes</h3><div class="list" id="topStudents"></div></article>
           <article class="card panel"><h3>Top potencial de mejora</h3><div class="list" id="improvementStudents"></div></article>
@@ -517,6 +813,25 @@
         </section>
       </section>
     </main>
+  </div>
+
+  <div class="modal-overlay" id="dataModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h3 id="modalTitle">Detalle</h3>
+          <p id="modalSubtitle">Consulta detallada</p>
+        </div>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Cerrar modal">×</button>
+      </div>
+      <div class="modal-toolbar" id="modalToolbar">
+        <label class="modal-search" aria-label="Buscar en resultados">
+          <span>⌕</span>
+          <input type="search" id="modalSearchInput" placeholder="Buscar estudiante o nivel..." />
+        </label>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
   </div>
 
   <script>
@@ -587,6 +902,213 @@
     const countBy = (items, key) => items.reduce((acc, item) => ((acc[item[key]] = (acc[item[key]] || 0) + 1), acc), {});
     const pct = (value, total) => `${((value / total) * 100).toFixed(1)}%`;
 
+    const modalState = {
+      type: null,
+      title: '',
+      subtitle: '',
+      rows: [],
+      student: null,
+      metricKey: 'global',
+      metricLabel: 'Puntaje'
+    };
+
+    function getModalElements() {
+      return {
+        overlay: document.getElementById('dataModal'),
+        title: document.getElementById('modalTitle'),
+        subtitle: document.getElementById('modalSubtitle'),
+        body: document.getElementById('modalBody'),
+        search: document.getElementById('modalSearchInput'),
+        toolbar: document.getElementById('modalToolbar')
+      };
+    }
+
+    function openModal({ title, subtitle, rows = [], metricKey = 'global', metricLabel = 'Puntaje', type = 'list', student = null }) {
+      const modal = getModalElements();
+      modalState.type = type;
+      modalState.title = title;
+      modalState.subtitle = subtitle;
+      modalState.rows = rows;
+      modalState.metricKey = metricKey;
+      modalState.metricLabel = metricLabel;
+      modalState.student = student;
+      modal.title.textContent = title;
+      modal.subtitle.textContent = subtitle;
+      modal.search.value = '';
+      modal.toolbar.style.display = type === 'student' ? 'none' : 'flex';
+      modal.overlay.classList.add('open');
+      modal.overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (type === 'student') renderStudentReport(student);
+      else renderModalList(rows, metricKey, metricLabel);
+      setTimeout(() => {
+        if (type !== 'student') modal.search.focus();
+      }, 80);
+    }
+
+    function closeModal() {
+      const modal = getModalElements();
+      modal.overlay.classList.remove('open');
+      modal.overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function renderModalList(rows, metricKey, metricLabel) {
+      const modal = getModalElements();
+      const query = modal.search.value.trim().toLowerCase();
+      const filtered = rows.filter(student => student.estudiante.toLowerCase().includes(query) || student.nivel.toLowerCase().includes(query));
+      const values = filtered.map(student => Number(student[metricKey] ?? 0));
+      const avg = values.length ? average(values) : 0;
+      const max = values.length ? Math.max(...values) : 0;
+      const min = values.length ? Math.min(...values) : 0;
+      modal.body.innerHTML = `
+        <section class="modal-stats">
+          <article class="modal-stat"><span>Estudiantes</span><strong>${filtered.length}</strong></article>
+          <article class="modal-stat"><span>Promedio</span><strong>${formatNumber(avg)}</strong></article>
+          <article class="modal-stat"><span>Máximo</span><strong>${max}</strong></article>
+          <article class="modal-stat"><span>Mínimo</span><strong>${min}</strong></article>
+        </section>
+        <div class="modal-table-wrap">
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Nivel</th>
+                <th>${metricLabel}</th>
+                <th>Global</th>
+                <th>Mejor parte</th>
+                <th>Área de mejora</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map(student => {
+                const partScores = partKeys.map((key, index) => ({ key, label: partLabels[index], value: student[key] }));
+                const best = [...partScores].sort((a, b) => b.value - a.value)[0];
+                const weak = [...partScores].sort((a, b) => a.value - b.value)[0];
+                return `<tr class="clickable-list-row" onclick="openStudentReportByName('${student.estudiante.replace(/'/g, "\'")}')">
+                  <td class="student-name">${student.estudiante}</td>
+                  <td><span class="level ${levelClass(student.nivel)}">${student.nivel}</span></td>
+                  <td>${scoreCell(student[metricKey])}</td>
+                  <td>${student.global}</td>
+                  <td>${best.label}: ${best.value}</td>
+                  <td>${weak.label}: ${weak.value}</td>
+                </tr>`;
+              }).join('') || `<tr><td colspan="6" class="empty-state">No hay estudiantes para esta búsqueda.</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function openStudentsModalByPart(partKey, partLabel) {
+      const rows = [...activeStudents()].sort((a, b) => b[partKey] - a[partKey]);
+      openModal({
+        title: `Detalle de ${partLabel}`,
+        subtitle: `Lista de estudiantes ordenada por puntaje en ${partLabel}. Usa el buscador para filtrar.`,
+        rows,
+        metricKey: partKey,
+        metricLabel: partLabel,
+        type: 'list'
+      });
+    }
+
+    function openStudentsModalByLevel(level) {
+      const rows = activeStudents().filter(student => student.nivel === level).sort((a, b) => b.global - a.global);
+      openModal({
+        title: `Estudiantes en nivel ${level}`,
+        subtitle: `Detalle de estudiantes clasificados en ${level}, ordenados por puntaje global.`,
+        rows,
+        metricKey: 'global',
+        metricLabel: 'Puntaje global',
+        type: 'list'
+      });
+    }
+
+    function openStudentsModalByRange(range) {
+      const rows = activeStudents().filter(student => student.global >= range.min && student.global <= range.max).sort((a, b) => b.global - a.global);
+      openModal({
+        title: `Estudiantes con global ${range.label}`,
+        subtitle: `Detalle de estudiantes cuyo puntaje global está en el rango ${range.label}.`,
+        rows,
+        metricKey: 'global',
+        metricLabel: 'Puntaje global',
+        type: 'list'
+      });
+    }
+
+    function openStudentReportByName(name) {
+      const student = students.find(item => item.estudiante === name);
+      if (!student) return;
+      openModal({
+        title: `Reporte individual`,
+        subtitle: `Análisis completo de ${student.estudiante}.`,
+        type: 'student',
+        student
+      });
+    }
+
+    function renderStudentReport(student) {
+      const modal = getModalElements();
+      const parts = partKeys.map((key, index) => ({ key, label: partLabels[index], value: student[key] }));
+      const best = [...parts].sort((a, b) => b.value - a.value)[0];
+      const weak = [...parts].sort((a, b) => a.value - b.value)[0];
+      const partAverage = average(parts.map(item => item.value));
+      const groupAvg = average(students.map(item => item.global));
+      const levelPeers = students.filter(item => item.nivel === student.nivel);
+      const levelAvg = average(levelPeers.map(item => item.global));
+      const sorted = [...students].sort((a, b) => b.global - a.global);
+      const rank = sorted.findIndex(item => item.estudiante === student.estudiante) + 1;
+      const status = student.global >= 80 ? 'Alto desempeño' : student.global >= 60 ? 'En consolidación' : student.global >= 45 ? 'Riesgo medio' : 'Riesgo alto';
+      const recommendation = student.global >= 80
+        ? 'Mantener actividades de profundización y retos de lectura inferencial.'
+        : student.global >= 60
+          ? `Reforzar ${weak.label} para acercarse a un desempeño alto.`
+          : `Priorizar acompañamiento en ${weak.label} y seguimiento semanal.`;
+
+      modal.body.innerHTML = `
+        <section class="student-report">
+          <div class="report-hero">
+            <div>
+              <h4>${student.estudiante}</h4>
+              <p>Nivel ${student.nivel} · Puesto ${rank} de ${students.length} · Estado: ${status}</p>
+            </div>
+            <div class="report-score">${student.global}</div>
+          </div>
+
+          <div class="report-grid">
+            <article class="report-card"><span>Promedio partes</span><strong>${formatNumber(partAverage)}</strong></article>
+            <article class="report-card"><span>Mejor competencia</span><strong>${best.label}</strong><span>${best.value} puntos</span></article>
+            <article class="report-card"><span>Área de mejora</span><strong>${weak.label}</strong><span>${weak.value} puntos</span></article>
+            <article class="report-card"><span>Promedio del grupo</span><strong>${formatNumber(groupAvg)}</strong><span>${student.global >= groupAvg ? 'Por encima del grupo' : 'Por debajo del grupo'}</span></article>
+            <article class="report-card"><span>Promedio de su nivel</span><strong>${formatNumber(levelAvg)}</strong><span>${levelPeers.length} estudiantes en ${student.nivel}</span></article>
+            <article class="report-card"><span>Recomendación</span><strong style="font-size:15px;line-height:1.35">${recommendation}</strong></article>
+          </div>
+
+          <div class="card panel" style="box-shadow:none">
+            <h3>Detalle por partes</h3>
+            <div class="part-report-list">
+              ${parts.map(part => `<div class="part-report-row">
+                <strong>${part.label}</strong>
+                <div class="progress-track"><div class="progress-fill" style="width:${part.value}%"></div></div>
+                <span class="metric">${part.value}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function openStudentFinderModal() {
+      openModal({
+        title: 'Buscar reporte individual',
+        subtitle: 'Selecciona un estudiante para abrir su reporte detallado de puntajes y análisis.',
+        rows: [...students].sort((a, b) => a.estudiante.localeCompare(b.estudiante, 'es')),
+        metricKey: 'global',
+        metricLabel: 'Puntaje global',
+        type: 'list'
+      });
+    }
+
     function activeStudents() {
       const level = document.getElementById('levelFilter').value;
       return level === 'all' ? students : students.filter(student => student.nivel === level);
@@ -655,26 +1177,64 @@
       const values = labels.map(level => levelCounts[level]);
       const minValue = Math.min(...partAverages.map(p => p.value));
 
-      makeChart('barChart', { type: 'bar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: partAverages.map(p => p.value === minValue ? '#b1121b' : '#0e3a5b'), borderRadius: 14, borderSkipped: false, barThickness: 38 }] }, options: baseBarOptions('Promedio') });
-      makeChart('donutChart', { type: 'doughnut', data: { labels, datasets: [{ data: values, backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5, hoverOffset: 8 }] }, options: donutOptions() });
+      makeChart('barChart', { type: 'bar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: partAverages.map(p => p.value === minValue ? '#b1121b' : '#0e3a5b'), borderRadius: 14, borderSkipped: false, barThickness: 38 }] }, options: baseBarOptions('Promedio', index => openStudentsModalByPart(partAverages[index].key, partAverages[index].label)) });
+      makeChart('donutChart', { type: 'doughnut', data: { labels, datasets: [{ data: values, backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5, hoverOffset: 8 }] }, options: donutOptions(index => openStudentsModalByLevel(labels[index])) });
       makeChart('radarChart', { type: 'radar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio por parte', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: 'rgba(212,175,55,0.20)', borderColor: '#b1121b', pointBackgroundColor: '#b1121b', pointBorderColor: '#fff', borderWidth: 3 }] }, options: radarOptions() });
-      makeChart('histogramChart', { type: 'bar', data: histogramData(rows), options: baseBarOptions('Estudiantes') });
+      const ranges = scoreRanges();
+      makeChart('histogramChart', { type: 'bar', data: histogramData(rows), options: baseBarOptions('Estudiantes', index => openStudentsModalByRange(ranges[index])) });
     }
 
-    function baseBarOptions(label) {
-      return { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${label}: ${ctx.raw}` } } }, scales: { y: { beginAtZero: true, grid: { color: '#eadfbe' } }, x: { grid: { display: false }, ticks: { font: { weight: '800' } } } } };
+    function baseBarOptions(label, onClickHandler = null) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        onHover: (event, elements) => {
+          event.native.target.style.cursor = elements.length && onClickHandler ? 'pointer' : 'default';
+        },
+        onClick: (event, elements, chart) => {
+          if (!onClickHandler || !elements.length) return;
+          onClickHandler(elements[0].index, chart);
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${label}: ${ctx.raw}` } }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#eadfbe' } },
+          x: { grid: { display: false }, ticks: { font: { weight: '800' } } }
+        }
+      };
     }
 
-    function donutOptions() {
-      return { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { weight: '800' } } }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} estudiantes (${pct(ctx.raw, ctx.dataset.data.reduce((a,b)=>a+b,0))})` } } } };
+    function donutOptions(onClickHandler = null) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        onHover: (event, elements) => {
+          event.native.target.style.cursor = elements.length && onClickHandler ? 'pointer' : 'default';
+        },
+        onClick: (event, elements, chart) => {
+          if (!onClickHandler || !elements.length) return;
+          onClickHandler(elements[0].index, chart);
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { weight: '800' } } },
+          tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} estudiantes (${pct(ctx.raw, ctx.dataset.data.reduce((a,b)=>a+b,0))})` } }
+        }
+      };
     }
 
     function radarOptions() {
       return { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: '800' } } }, tooltip: { backgroundColor: '#101827', padding: 12 } }, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20, backdropColor: 'transparent' }, angleLines: { color: '#e5e7eb' }, grid: { color: '#eadfbe' }, pointLabels: { color: '#0e3a5b', font: { weight: '900', size: 13 } } } } };
     }
 
+    function scoreRanges() {
+      return [{ label: '0-39', min: 0, max: 39 }, { label: '40-59', min: 40, max: 59 }, { label: '60-79', min: 60, max: 79 }, { label: '80-100', min: 80, max: 100 }];
+    }
+
     function histogramData(rows) {
-      const ranges = [{ label: '0-39', min: 0, max: 39 }, { label: '40-59', min: 40, max: 59 }, { label: '60-79', min: 60, max: 79 }, { label: '80-100', min: 80, max: 100 }];
+      const ranges = scoreRanges();
       return { labels: ranges.map(r => r.label), datasets: [{ data: ranges.map(r => rows.filter(s => s.global >= r.min && s.global <= r.max).length), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] };
     }
 
@@ -697,19 +1257,19 @@
       document.getElementById('a1Count').textContent = counts.A1 || 0;
       document.getElementById('preA1Count').textContent = counts['Pre A1'] || 0;
       const labels = levelOrder.filter(l => rows.some(s => s.nivel === l));
-      makeChart('levelAverageChart', { type: 'bar', data: { labels, datasets: [{ data: labels.map(l => +formatNumber(average(rows.filter(s => s.nivel === l).map(s => s.global)))), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] }, options: baseBarOptions('Promedio') });
-      makeChart('levelDonutChart', { type: 'doughnut', data: { labels, datasets: [{ data: labels.map(l => counts[l]), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5 }] }, options: donutOptions() });
+      makeChart('levelAverageChart', { type: 'bar', data: { labels, datasets: [{ data: labels.map(l => +formatNumber(average(rows.filter(s => s.nivel === l).map(s => s.global)))), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] }, options: baseBarOptions('Promedio', index => openStudentsModalByLevel(labels[index])) });
+      makeChart('levelDonutChart', { type: 'doughnut', data: { labels, datasets: [{ data: labels.map(l => counts[l]), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5 }] }, options: donutOptions(index => openStudentsModalByLevel(labels[index])) });
       document.getElementById('levelInsights').innerHTML = labels.map(level => { const group = rows.filter(s => s.nivel === level); const avg = average(group.map(s => s.global)); return `<div class="list-row"><div><strong>${level}</strong><span>${group.length} estudiantes, equivalente al ${pct(group.length, rows.length)} del grupo filtrado.</span></div><div class="metric">${formatNumber(avg)}</div></div>`; }).join('');
     }
 
     function renderRanking() {
       const rows = activeStudents();
       const sorted = [...rows].sort((a, b) => b.global - a.global);
-      document.getElementById('topStudents').innerHTML = sorted.slice(0, 10).map((s, i) => `<div class="list-row"><div><strong>${i + 1}. ${s.estudiante}</strong><span>Nivel ${s.nivel}</span></div><div class="metric">${s.global}</div></div>`).join('');
+      document.getElementById('topStudents').innerHTML = sorted.slice(0, 10).map((s, i) => `<div class="list-row clickable-list-row" onclick="openStudentReportByName('${s.estudiante.replace(/'/g, "\'")}')"><div><strong>${i + 1}. ${s.estudiante}</strong><span>Nivel ${s.nivel} · Clic para ver reporte</span></div><div class="metric">${s.global}</div></div>`).join('');
       const weakKey = [...getPartAverages(rows)].sort((a, b) => a.value - b.value)[0].key;
       const potential = rows.map(s => ({ ...s, lowPart: s[weakKey], gap: s.global - s[weakKey] })).sort((a, b) => b.gap - a.gap).slice(0, 10);
-      document.getElementById('improvementStudents').innerHTML = potential.map(s => `<div class="list-row"><div><strong>${s.estudiante}</strong><span>Brecha entre global y competencia débil: ${s.gap} puntos.</span></div><div class="metric">${s.lowPart}</div></div>`).join('');
-      makeChart('rankingChart', { type: 'bar', data: { labels: sorted.map(s => s.estudiante), datasets: [{ label: 'Puntaje global', data: sorted.map(s => s.global), backgroundColor: sorted.map(s => s.global >= 80 ? '#1d6f42' : s.global >= 60 ? '#0e3a5b' : s.global >= 45 ? '#b7791f' : '#b1121b'), borderRadius: 10, borderSkipped: false }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12 } }, scales: { x: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 } } } } } });
+      document.getElementById('improvementStudents').innerHTML = potential.map(s => `<div class="list-row clickable-list-row" onclick="openStudentReportByName('${s.estudiante.replace(/'/g, "\'")}')"><div><strong>${s.estudiante}</strong><span>Brecha entre global y competencia débil: ${s.gap} puntos. Clic para ver reporte.</span></div><div class="metric">${s.lowPart}</div></div>`).join('');
+      makeChart('rankingChart', { type: 'bar', data: { labels: sorted.map(s => s.estudiante), datasets: [{ label: 'Puntaje global', data: sorted.map(s => s.global), backgroundColor: sorted.map(s => s.global >= 80 ? '#1d6f42' : s.global >= 60 ? '#0e3a5b' : s.global >= 45 ? '#b7791f' : '#b1121b'), borderRadius: 10, borderSkipped: false }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, onHover: (event, elements) => { event.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }, onClick: (event, elements) => { if (!elements.length) return; openStudentReportByName(sorted[elements[0].index].estudiante); }, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `Puntaje global: ${ctx.raw}. Clic para reporte individual.` } } }, scales: { x: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 } } } } } });
     }
 
     function renderRiesgo() {
@@ -800,6 +1360,17 @@
       document.getElementById('levelFilter').addEventListener('change', renderActiveView);
       document.getElementById('searchInput').addEventListener('input', renderTable);
       document.getElementById('tableLevelFilter').addEventListener('change', renderTable);
+      document.getElementById('modalSearchInput').addEventListener('input', () => {
+        if (modalState.type === 'list') renderModalList(modalState.rows, modalState.metricKey, modalState.metricLabel);
+      });
+      document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+      document.getElementById('dataModal').addEventListener('click', event => {
+        if (event.target.id === 'dataModal') closeModal();
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && document.getElementById('dataModal').classList.contains('open')) closeModal();
+      });
+      document.getElementById('openStudentReportBtn').addEventListener('click', openStudentFinderModal);
       document.querySelectorAll('th[data-key]').forEach(th => th.addEventListener('click', () => { const key = th.dataset.key; currentSort = currentSort.key === key ? { key, direction: currentSort.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: key === 'estudiante' || key === 'nivel' ? 'asc' : 'desc' }; renderTable(); }));
     }
 
