@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Analítico - Inglés</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg: #f7f3e8;
+      --surface: #ffffff;
+      --surface-soft: #fffaf0;
+      --text: #1f2933;
+      --muted: #6f6a5d;
+      --line: #eadfbe;
+      --accent: #b1121b;
+      --accent-soft: #fff1cc;
+      --accent-dark: #7f0d14;
+      --gold: #d4af37;
+      --gold-soft: #fff3c4;
+      --navy: #0e3a5b;
+      --navy-soft: #dbeafe;
+      --dark: #101827;
+      --green: #1d6f42;
+      --blue: #0e3a5b;
+      --amber: #b7791f;
+      --shadow: 0 18px 45px rgba(78, 52, 13, 0.10);
+      --shadow-soft: 0 10px 24px rgba(78, 52, 13, 0.08);
+      --radius: 22px;
+      --sidebar-width: 300px;
+      --sidebar-collapsed: 92px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      width: 100%;
+      min-width: 320px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top left, #fffef8 0, var(--bg) 42%, #efe2b8 100%);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    img, canvas, svg {
+      max-width: 100%;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      min-height: 100vh;
+      width: 100%;
+      max-width: 100vw;
+      transition: grid-template-columns 0.25s ease;
+    }
+
+    .app.collapsed { grid-template-columns: var(--sidebar-collapsed) minmax(0, 1fr); }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 26px 18px;
+      background: linear-gradient(180deg, #8f0f16 0%, #641018 52%, #0e3a5b 100%);
+      color: #fff;
+      border-right: 1px solid rgba(255, 243, 196, 0.14);
+      overflow: hidden;
+    }
+
+    .sidebar-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .app.collapsed .sidebar-top { justify-content: center; }
+
+    .brand { display: flex; align-items: center; gap: 12px; min-height: 58px; min-width: 0; }
+    .brand-logo {
+      width: 58px; height: 58px; display: grid; place-items: center;
+      border-radius: 18px; background: linear-gradient(135deg, #fff8d6, #d4af37);
+      box-shadow: 0 12px 28px rgba(212, 175, 55, 0.28);
+      border: 2px solid rgba(255, 231, 146, 0.85);
+      overflow: hidden; flex: 0 0 auto;
+    }
+
+    .brand-logo img {
+      width: 100%; height: 100%; object-fit: contain; display: block;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+    }
+
+    .brand-text, .nav-text {
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .nav-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-footer {
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .brand-text h1 { font-size: 16px; line-height: 1.1; letter-spacing: -0.03em; color: #fff8d6; }
+    .brand-text p { margin-top: 4px; font-size: 12px; color: rgba(255, 243, 196, 0.78); }
+
+    .app.collapsed .brand-text,
+    .app.collapsed .nav-text,
+    .app.collapsed .sidebar-footer {
+      opacity: 0; transform: translateX(-8px); pointer-events: none;
+    }
+
+    .toggle-btn {
+      width: 44px; height: 44px; border: 0; border-radius: 14px;
+      background: rgba(255, 243, 196, 0.13); color: #fff8d6; font-size: 20px;
+      transition: 0.2s ease;
+    }
+    .toggle-btn:hover { background: rgba(255, 243, 196, 0.22); }
+    .app.collapsed .toggle-btn { position: absolute; bottom: 24px; left: 22px; }
+
+    .nav { margin-top: 34px; display: grid; gap: 10px; }
+    .nav-item {
+      width: 100%; display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px; border: 0; border-radius: 16px;
+      background: transparent; color: rgba(255, 248, 214, 0.78);
+      font-size: 14px; font-weight: 700; text-align: left; transition: 0.18s ease;
+      min-width: 0; overflow: hidden;
+    }
+    .nav-item:hover { background: rgba(255, 243, 196, 0.12); color: #fff8d6; transform: translateX(2px); }
+    .nav-item.active {
+      color: #fff8d6; background: rgba(212, 175, 55, 0.20);
+      box-shadow: inset 3px 0 0 var(--gold);
+    }
+    .nav-icon { width: 24px; text-align: center; flex: 0 0 auto; }
+
+    .sidebar-footer {
+      position: absolute; left: 18px; right: 18px; bottom: 26px;
+      padding: 16px; border-radius: 18px;
+      background: rgba(255, 243, 196, 0.10); border: 1px solid rgba(255, 243, 196, 0.16);
+      max-width: calc(100% - 36px);
+    }
+    .sidebar-footer strong { display: block; margin-bottom: 6px; font-size: 13px; color: #fff8d6; line-height: 1.25; max-width: 100%; }
+    .sidebar-footer span { display: block; color: rgba(255, 243, 196, 0.72); font-size: 12px; line-height: 1.45; max-width: 100%; }
+
+    .main { padding: clamp(16px, 2.4vw, 30px); min-width: 0; width: 100%; max-width: 100vw; }
+
+    .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; min-width: 0; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; margin-bottom: 12px;
+      border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark);
+      font-size: 12px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .title { min-width: 0; }
+    .title h2 { font-size: clamp(25px, 4vw, 42px); line-height: 1.05; letter-spacing: -0.055em; color: #171a20; overflow-wrap: anywhere; }
+    .title p { max-width: 840px; margin-top: 12px; color: var(--muted); font-size: clamp(13px, 1.6vw, 15px); line-height: 1.6; }
+    .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
+
+    .pill, .select-pill {
+      padding: 12px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft); font-size: 13px; color: var(--muted); font-weight: 800; white-space: nowrap;
+      max-width: 100%;
+    }
+    .select-pill { outline: none; color: #374151; }
+
+    .view { display: none; animation: fadeIn 0.25s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: rgba(255,255,255,0.95); border: 1px solid rgba(234, 223, 190, 0.95);
+      border-radius: var(--radius); box-shadow: var(--shadow-soft); backdrop-filter: blur(14px);
+    }
+
+    .grid-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
+    .kpi-card { padding: 22px; position: relative; overflow: hidden; min-height: 154px; }
+    .kpi-card::after {
+      content: ''; position: absolute; width: 120px; height: 120px; border-radius: 999px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.22), rgba(177, 18, 27, 0)); top: -30px; right: -34px;
+    }
+    .kpi-label { color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi-value { margin-top: 15px; font-size: 34px; line-height: 1; font-weight: 900; letter-spacing: -0.055em; color: #151820; }
+    .kpi-note { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .kpi-badge { display: inline-flex; align-items: center; margin-top: 16px; padding: 7px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); font-weight: 900; font-size: 12px; }
+
+    .summary-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
+    .insight { padding: 20px; }
+    .insight strong { display: block; font-size: 14px; margin-bottom: 8px; color: #171a20; }
+    .insight span, .insight li { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .insight ul { padding-left: 18px; display: grid; gap: 6px; }
+
+    .charts-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
+    .charts-grid.equal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .chart-card { padding: clamp(16px, 2vw, 22px); min-height: clamp(340px, 42vw, 390px); min-width: 0; overflow: hidden; }
+    .chart-card.tall { min-height: clamp(410px, 48vw, 470px); }
+    .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; min-width: 0; }
+    .chart-head h3 { font-size: clamp(15px, 2vw, 17px); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+    .chart-head p { margin-top: 6px; color: var(--muted); font-size: clamp(12px, 1.6vw, 13px); line-height: 1.45; }
+    .chart-tag { padding: 7px 10px; border-radius: 999px; background: #f3f4f6; color: #4b5563; font-size: 12px; font-weight: 900; white-space: nowrap; flex: 0 0 auto; }
+    .chart-wrap { position: relative; height: clamp(260px, 35vw, 300px); width: 100%; min-width: 0; }
+    .chart-card.tall .chart-wrap { height: clamp(320px, 42vw, 380px); }
+    .chart-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+
+    .analysis-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
+    .panel { padding: 22px; }
+    .panel h3 { font-size: 17px; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .list { display: grid; gap: 12px; }
+    .list-row {
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px;
+      padding: 13px 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff;
+    }
+    .list-row strong { font-size: 14px; color: #171a20; }
+    .list-row span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .metric { font-weight: 900; color: var(--accent); white-space: nowrap; }
+
+    .progress-item { display: grid; gap: 8px; }
+    .progress-top { display: flex; justify-content: space-between; color: #374151; font-weight: 800; font-size: 13px; }
+    .progress-track { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #b1121b, #d4af37); }
+
+    .table-card { padding: 0; overflow: hidden; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fbfbfc); }
+    .table-toolbar h3 { font-size: 17px; letter-spacing: -0.02em; }
+    .table-toolbar p { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+    .search { width: min(340px, 100%); display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 14px; }
+    .table-scroll { max-height: 540px; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-inline: contain; }
+    .table-scroll::after { content: 'Desliza horizontalmente para ver todas las columnas'; display: none; padding: 10px 14px; color: var(--muted); font-size: 12px; background: #fffaf0; border-top: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    thead th { position: sticky; top: 0; z-index: 2; padding: 14px 16px; background: #f9fafb; color: #4b5563; border-bottom: 1px solid var(--line); font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; text-align: left; cursor: pointer; user-select: none; }
+    tbody td { padding: 15px 16px; border-bottom: 1px solid #eef0f3; color: #30343b; font-size: 14px; white-space: nowrap; }
+    tbody tr:nth-child(even) { background: #fcfcfd; }
+    tbody tr:hover { background: #fff7f7; }
+    .student-name { font-weight: 900; color: #171a20; }
+
+    .level { display: inline-flex; justify-content: center; min-width: 72px; padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; background: #f3f4f6; color: #374151; }
+    .level.b1 { background: #dcfce7; color: #166534; }
+    .level.a2 { background: #e0f2fe; color: #075985; }
+    .level.a1 { background: #fef3c7; color: #92400e; }
+    .level.pre-a1 { background: #fee2e2; color: #991b1b; }
+
+    .score-bar { display: flex; align-items: center; gap: 9px; }
+    .mini-track { width: 78px; height: 8px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+    .mini-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #b1121b, #d4af37); }
+
+    .empty-state { padding: 30px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 1180px) {
+      .grid-kpis, .summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .charts-grid, .charts-grid.equal, .analysis-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .app, .app.collapsed { grid-template-columns: 1fr; }
+      .sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        height: auto;
+        padding: 14px 16px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 243, 196, 0.14);
+        overflow: visible;
+      }
+      .sidebar-top { gap: 10px; }
+      .app.collapsed .sidebar-top { justify-content: space-between; }
+      .brand-logo { width: 52px; height: 52px; border-radius: 16px; }
+      .brand-text h1 { font-size: 15px; }
+
+      .nav {
+        display: none;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 14px;
+        max-height: calc(100vh - 96px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 10px;
+        border-radius: 20px;
+        background: rgba(16, 24, 39, 0.20);
+        border: 1px solid rgba(255, 243, 196, 0.14);
+        box-shadow: 0 18px 35px rgba(16, 24, 39, 0.22);
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .sidebar.mobile-open .nav {
+        display: grid;
+      }
+
+      .nav::-webkit-scrollbar { width: 6px; }
+      .nav::-webkit-scrollbar-thumb { background: rgba(255, 243, 196, 0.28); border-radius: 999px; }
+      .nav-item {
+        width: 100%;
+        min-width: 0;
+        justify-content: flex-start;
+        padding: 13px 14px;
+        border-radius: 15px;
+      }
+      .nav-icon { width: 24px; }
+      .nav-text { opacity: 1; transform: none; pointer-events: auto; white-space: normal; }
+      .sidebar-footer { display: none; }
+      .app.collapsed .brand-text, .app.collapsed .nav-text { opacity: 1; transform: none; pointer-events: auto; }
+      .app.collapsed .toggle-btn { position: static; }
+      .toggle-btn { flex: 0 0 auto; }
+      .toggle-btn[aria-expanded="true"] { background: rgba(212, 175, 55, 0.28); color: #ffffff; }
+      .main { padding: 18px; }
+      .header, .table-toolbar { flex-direction: column; align-items: stretch; }
+      .header-actions, .toolbar-actions { justify-content: flex-start; width: 100%; }
+      .select-pill, .pill { flex: 1 1 auto; text-align: center; }
+      .chart-head { flex-direction: column; gap: 10px; }
+      .chart-tag { align-self: flex-start; }
+      .table-scroll::after { display: block; }
+    }
+
+    @media (max-width: 640px) {
+      :root { --radius: 18px; }
+      .main { padding: 14px; }
+      .sidebar { padding: 14px; }
+      .toggle-btn { width: 42px; height: 42px; flex: 0 0 auto; }
+      .brand { gap: 10px; }
+      .brand-logo { width: 48px; height: 48px; }
+      .brand-text h1 { font-size: 14px; }
+      .brand-text p { font-size: 11px; }
+      .eyebrow { font-size: 10px; padding: 6px 10px; }
+      .title h2 { font-size: clamp(23px, 8vw, 34px); letter-spacing: -0.04em; }
+      .title p { font-size: 13px; }
+      .header-actions { gap: 8px; }
+      .pill, .select-pill { width: 100%; padding: 11px 13px; font-size: 12px; }
+      .grid-kpis, .summary-strip, .charts-grid, .charts-grid.equal, .analysis-grid { grid-template-columns: 1fr; gap: 12px; }
+      .kpi-card { padding: 18px; min-height: auto; }
+      .kpi-value { font-size: 30px; }
+      .insight, .panel, .chart-card { padding: 16px; }
+      .chart-card { min-height: 330px; }
+      .chart-card.tall { min-height: 390px; }
+      .chart-wrap { height: 250px; }
+      .chart-card.tall .chart-wrap { height: 310px; }
+      .list-row { grid-template-columns: 1fr; gap: 8px; }
+      .metric { justify-self: start; }
+      .toolbar-actions { flex-direction: column; align-items: stretch; }
+      .search { width: 100%; }
+      .table-toolbar { padding: 16px; }
+      .table-scroll { max-height: 66vh; }
+      table { min-width: 820px; }
+      thead th, tbody td { padding: 12px 12px; font-size: 12px; }
+      .mini-track { width: 52px; }
+    }
+
+    @media (max-width: 420px) {
+      .main { padding: 12px; }
+      .sidebar { padding: 12px; }
+      .brand-logo { width: 44px; height: 44px; }
+      .brand-text h1 { max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .nav-item { min-width: 132px; font-size: 12px; padding: 11px 12px; }
+      .chart-card { min-height: 310px; }
+      .chart-wrap { height: 230px; }
+      .chart-card.tall .chart-wrap { height: 285px; }
+      .kpi-value { font-size: 28px; }
+      table { min-width: 760px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-logo"><img src="https://i.ibb.co/HpRtB3mw/Dise-o-sin-t-tulo-100.png" alt="Logo Liceo del Caribe"></div>
+          <div class="brand-text">
+            <h1>Liceo del Caribe</h1>
+            <p>English Analytics</p>
+          </div>
+        </div>
+        <button class="toggle-btn" id="toggleSidebar" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebarNav">☰</button>
+      </div>
+
+      <nav class="nav" id="sidebarNav" aria-label="Vistas del dashboard">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">◼</span><span class="nav-text">Dashboard</span></button>
+        <button class="nav-item" data-view="competencias"><span class="nav-icon">◎</span><span class="nav-text">Competencias</span></button>
+        <button class="nav-item" data-view="niveles"><span class="nav-icon">◌</span><span class="nav-text">Niveles MCER</span></button>
+        <button class="nav-item" data-view="ranking"><span class="nav-icon">★</span><span class="nav-text">Ranking</span></button>
+        <button class="nav-item" data-view="riesgo"><span class="nav-icon">!</span><span class="nav-text">Riesgo académico</span></button>
+        <button class="nav-item" data-view="datos"><span class="nav-icon">▦</span><span class="nav-text">Base de datos</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <strong id="sidebarTitle">Lectura ejecutiva</strong>
+        <span id="sidebarHint">Selecciona una vista para explorar el rendimiento desde diferentes ángulos.</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <section class="title">
+          <div class="eyebrow" id="viewEyebrow">● Dashboard Institucional</div>
+          <h2 id="viewTitle">Análisis de Resultados de Inglés</h2>
+          <p id="viewDescription">Visualización profesional del desempeño por estudiante, nivel MCER y partes del examen. El tablero identifica fortalezas, brechas y prioridades de mejora para la toma de decisiones académicas.</p>
+        </section>
+        <div class="header-actions">
+          <div class="pill" id="studentCount">46 estudiantes</div>
+          <select class="select-pill" id="levelFilter" aria-label="Filtrar por nivel">
+            <option value="all">Todos los niveles</option>
+          </select>
+          <div class="pill" id="updatedAt">Actualizado hoy</div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-dashboard">
+        <section class="grid-kpis">
+          <article class="card kpi-card"><div class="kpi-label">Promedio global</div><div class="kpi-value" id="avgGlobal">--</div><div class="kpi-note">Media general del salón según puntaje global.</div><div class="kpi-badge">Indicador principal</div></article>
+          <article class="card kpi-card"><div class="kpi-label">Nivel predominante</div><div class="kpi-value" id="modeLevel">--</div><div class="kpi-note" id="modeLevelNote">Moda de los niveles MCER.</div><div class="kpi-badge">Distribución MCER</div></article>
+          <article class="card kpi-card"><div class="kpi-label">Mejor competencia</div><div class="kpi-value" id="bestPart">--</div><div class="kpi-note" id="bestPartNote">Parte con mayor promedio.</div><div class="kpi-badge">Fortaleza</div></article>
+          <article class="card kpi-card"><div class="kpi-label">Área de mejora</div><div class="kpi-value" id="weakPart">--</div><div class="kpi-note" id="weakPartNote">Parte con menor promedio.</div><div class="kpi-badge">Prioridad</div></article>
+        </section>
+
+        <section class="summary-strip">
+          <article class="card insight"><strong>Lectura rápida</strong><span id="quickInsight">Calculando análisis del grupo...</span></article>
+          <article class="card insight"><strong>Fortaleza académica</strong><span id="strengthInsight">Calculando parte con mejor rendimiento...</span></article>
+          <article class="card insight"><strong>Intervención sugerida</strong><span id="improveInsight">Calculando parte crítica...</span></article>
+        </section>
+
+        <section class="charts-grid">
+          <article class="card chart-card"><div class="chart-head"><div><h3>Promedio por parte del examen</h3><p>Comparación del rendimiento promedio en las Partes 1 a 7.</p></div><span class="chart-tag">Barras</span></div><div class="chart-wrap"><canvas id="barChart"></canvas></div></article>
+          <article class="card chart-card"><div class="chart-head"><div><h3>Distribución por nivel MCER</h3><p>Proporción de estudiantes por nivel alcanzado.</p></div><span class="chart-tag">Donut</span></div><div class="chart-wrap"><canvas id="donutChart"></canvas></div></article>
+        </section>
+
+        <section class="charts-grid equal">
+          <article class="card chart-card"><div class="chart-head"><div><h3>Radar integral del salón</h3><p>Perfil promedio en las siete partes evaluadas.</p></div><span class="chart-tag">Radar</span></div><div class="chart-wrap"><canvas id="radarChart"></canvas></div></article>
+          <article class="card chart-card"><div class="chart-head"><div><h3>Distribución de puntajes globales</h3><p>Cantidad de estudiantes por rango de desempeño.</p></div><span class="chart-tag">Histograma</span></div><div class="chart-wrap"><canvas id="histogramChart"></canvas></div></article>
+        </section>
+      </section>
+
+      <section class="view" id="view-competencias">
+        <section class="analysis-grid">
+          <article class="card panel"><h3>Ranking de competencias</h3><div class="list" id="competencyRanking"></div></article>
+          <article class="card panel"><h3>Brecha frente a meta 70</h3><div class="list" id="gapList"></div></article>
+        </section>
+        <section class="charts-grid equal">
+          <article class="card chart-card tall"><div class="chart-head"><div><h3>Promedio y dispersión por parte</h3><p>La línea muestra el promedio. Las barras suaves muestran mínimo y máximo del grupo.</p></div><span class="chart-tag">Mixto</span></div><div class="chart-wrap"><canvas id="rangeChart"></canvas></div></article>
+          <article class="card chart-card tall"><div class="chart-head"><div><h3>Competencia por nivel MCER</h3><p>Compara el promedio de cada parte dentro de cada nivel.</p></div><span class="chart-tag">Barras agrupadas</span></div><div class="chart-wrap"><canvas id="levelPartChart"></canvas></div></article>
+        </section>
+        <section class="summary-strip">
+          <article class="card insight"><strong>Diagnóstico por competencia</strong><span id="competencyDiagnosis"></span></article>
+          <article class="card insight"><strong>Patrón observado</strong><span>Las partes con promedios altos muestran dominio general, pero las partes con alta dispersión indican que algunos estudiantes necesitan refuerzo personalizado.</span></article>
+          <article class="card insight"><strong>Acción recomendada</strong><span>Diseñar actividades por grupos: uno de recuperación para la competencia más baja y otro de profundización para estudiantes B1.</span></article>
+        </section>
+      </section>
+
+      <section class="view" id="view-niveles">
+        <section class="grid-kpis">
+          <article class="card kpi-card"><div class="kpi-label">B1</div><div class="kpi-value" id="b1Count">--</div><div class="kpi-note">Estudiantes con mayor dominio.</div><div class="kpi-badge">Avanzados</div></article>
+          <article class="card kpi-card"><div class="kpi-label">A2</div><div class="kpi-value" id="a2Count">--</div><div class="kpi-note">Grupo intermedio con potencial de subir a B1.</div><div class="kpi-badge">Transición</div></article>
+          <article class="card kpi-card"><div class="kpi-label">A1</div><div class="kpi-value" id="a1Count">--</div><div class="kpi-note">Requieren consolidación de bases.</div><div class="kpi-badge">Refuerzo</div></article>
+          <article class="card kpi-card"><div class="kpi-label">Pre A1</div><div class="kpi-value" id="preA1Count">--</div><div class="kpi-note">Prioridad de acompañamiento.</div><div class="kpi-badge">Crítico</div></article>
+        </section>
+        <section class="charts-grid equal">
+          <article class="card chart-card"><div class="chart-head"><div><h3>Promedio global por nivel</h3><p>Permite comparar el rendimiento medio entre niveles MCER.</p></div><span class="chart-tag">Barras</span></div><div class="chart-wrap"><canvas id="levelAverageChart"></canvas></div></article>
+          <article class="card chart-card"><div class="chart-head"><div><h3>Peso porcentual por nivel</h3><p>Distribución porcentual del salón por nivel.</p></div><span class="chart-tag">Donut</span></div><div class="chart-wrap"><canvas id="levelDonutChart"></canvas></div></article>
+        </section>
+        <section class="card panel"><h3>Lectura por nivel</h3><div class="list" id="levelInsights"></div></section>
+      </section>
+
+      <section class="view" id="view-ranking">
+        <section class="analysis-grid">
+          <article class="card panel"><h3>Top 10 estudiantes</h3><div class="list" id="topStudents"></div></article>
+          <article class="card panel"><h3>Top potencial de mejora</h3><div class="list" id="improvementStudents"></div></article>
+        </section>
+        <section class="card chart-card tall"><div class="chart-head"><div><h3>Ranking completo por puntaje global</h3><p>Visualización horizontal de todos los estudiantes ordenados por desempeño.</p></div><span class="chart-tag">Ranking</span></div><div class="chart-wrap"><canvas id="rankingChart"></canvas></div></section>
+      </section>
+
+      <section class="view" id="view-riesgo">
+        <section class="grid-kpis">
+          <article class="card kpi-card"><div class="kpi-label">Riesgo alto</div><div class="kpi-value" id="highRiskCount">--</div><div class="kpi-note">Global menor a 45.</div><div class="kpi-badge">Prioridad 1</div></article>
+          <article class="card kpi-card"><div class="kpi-label">Riesgo medio</div><div class="kpi-value" id="mediumRiskCount">--</div><div class="kpi-note">Global entre 45 y 59.</div><div class="kpi-badge">Prioridad 2</div></article>
+          <article class="card kpi-card"><div class="kpi-label">En consolidación</div><div class="kpi-value" id="stableCount">--</div><div class="kpi-note">Global entre 60 y 79.</div><div class="kpi-badge">Seguimiento</div></article>
+          <article class="card kpi-card"><div class="kpi-label">Alto desempeño</div><div class="kpi-value" id="excellentCount">--</div><div class="kpi-note">Global igual o superior a 80.</div><div class="kpi-badge">Fortaleza</div></article>
+        </section>
+        <section class="analysis-grid">
+          <article class="card panel"><h3>Estudiantes con riesgo alto</h3><div class="list" id="riskStudents"></div></article>
+          <article class="card panel"><h3>Plan de intervención sugerido</h3><div class="list" id="interventionPlan"></div></article>
+        </section>
+        <section class="card chart-card"><div class="chart-head"><div><h3>Matriz de riesgo por estudiante</h3><p>Cruce entre puntaje global y desempeño en la competencia más baja.</p></div><span class="chart-tag">Dispersión</span></div><div class="chart-wrap"><canvas id="riskScatterChart"></canvas></div></section>
+      </section>
+
+      <section class="view" id="view-datos">
+        <section class="card table-card">
+          <div class="table-toolbar">
+            <div><h3>Base completa de estudiantes</h3><p>Haz clic en los encabezados para ordenar. Usa el buscador para filtrar por nombre o nivel.</p></div>
+            <div class="toolbar-actions">
+              <label class="search" aria-label="Buscar estudiante"><span>⌕</span><input type="search" id="searchInput" placeholder="Buscar estudiante o nivel..." /></label>
+              <select class="select-pill" id="tableLevelFilter" aria-label="Filtrar tabla por nivel"><option value="all">Todos</option></select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th data-key="estudiante">Estudiante</th><th data-key="global">Global</th><th data-key="nivel">Nivel</th><th data-key="parte1">Parte 1</th><th data-key="parte2">Parte 2</th><th data-key="parte3">Parte 3</th><th data-key="parte4">Parte 4</th><th data-key="parte5">Parte 5</th><th data-key="parte6">Parte 6</th><th data-key="parte7">Parte 7</th></tr></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const students = [
+      { estudiante: 'Keitin Rico', global: 80, nivel: 'B1', parte1: 84, parte2: 90, parte3: 88, parte4: 84, parte5: 70, parte6: 21, parte7: 97 },
+      { estudiante: 'Peter Infante', global: 92, nivel: 'B1', parte1: 100, parte2: 100, parte3: 100, parte4: 95, parte5: 58, parte6: 84, parte7: 97 },
+      { estudiante: 'Valeria Pava', global: 94, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 100, parte5: 93, parte6: 84, parte7: 89 },
+      { estudiante: 'Cristian Garcia', global: 76, nivel: 'B1', parte1: 84, parte2: 75, parte3: 88, parte4: 95, parte5: 93, parte6: 63, parte7: 48 },
+      { estudiante: 'Shailene Chasoy', global: 67, nivel: 'B1', parte1: 100, parte2: 30, parte3: 100, parte4: 84, parte5: 58, parte6: 63, parte7: 48 },
+      { estudiante: 'Isabella Vidal', global: 78, nivel: 'B1', parte1: 100, parte2: 100, parte3: 88, parte4: 63, parte5: 70, parte6: 63, parte7: 73 },
+      { estudiante: 'Zllaron Villalba', global: 67, nivel: 'B1', parte1: 100, parte2: 45, parte3: 100, parte4: 84, parte5: 58, parte6: 63, parte7: 40 },
+      { estudiante: 'Gabriel Tetay', global: 74, nivel: 'B1', parte1: 63, parte2: 100, parte3: 88, parte4: 63, parte5: 70, parte6: 63, parte7: 73 },
+      { estudiante: 'Angelina Orozco', global: 46, nivel: 'A2', parte1: 63, parte2: 75, parte3: 70, parte4: 42, parte5: 70, parte6: 0, parte7: 16 },
+      { estudiante: 'Alejandra Vidal', global: 74, nivel: 'B1', parte1: 63, parte2: 100, parte3: 88, parte4: 63, parte5: 82, parte6: 63, parte7: 65 },
+      { estudiante: 'Yorieth Palmar', global: 63, nivel: 'A2', parte1: 63, parte2: 60, parte3: 88, parte4: 53, parte5: 35, parte6: 63, parte7: 81 },
+      { estudiante: 'Oscar Pinto', global: 52, nivel: 'A2', parte1: 42, parte2: 90, parte3: 88, parte4: 53, parte5: 35, parte6: 63, parte7: 24 },
+      { estudiante: 'Camila Guerra', global: 40, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 11, parte5: 47, parte6: 42, parte7: 48 },
+      { estudiante: 'Aimat Diaz Daza', global: 53, nivel: 'A2', parte1: 100, parte2: 75, parte3: 100, parte4: 42, parte5: 23, parte6: 42, parte7: 32 },
+      { estudiante: 'Samuel Peralta', global: 29, nivel: 'Pre A1', parte1: 0, parte2: 0, parte3: 35, parte4: 42, parte5: 35, parte6: 21, parte7: 40 },
+      { estudiante: 'Eboy Gutierrez', global: 67, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 74, parte5: 58, parte6: 63, parte7: 32 },
+      { estudiante: 'Ulandris Santos', global: 34, nivel: 'A1', parte1: 0, parte2: 60, parte3: 70, parte4: 21, parte5: 23, parte6: 42, parte7: 32 },
+      { estudiante: 'Gabriela Blanco', global: 82, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 74, parte5: 93, parte6: 63, parte7: 73 },
+      { estudiante: 'Ricardo Montiel', global: 88, nivel: 'B1', parte1: 84, parte2: 100, parte3: 88, parte4: 100, parte5: 82, parte6: 21, parte7: 97 },
+      { estudiante: 'Isabela Stor', global: 44, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 21, parte5: 47, parte6: 42, parte7: 57 },
+      { estudiante: 'Daines Castros', global: 44, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 21, parte5: 47, parte6: 42, parte7: 57 },
+      { estudiante: 'Sinais Martinez', global: 63, nivel: 'A2', parte1: 84, parte2: 75, parte3: 70, parte4: 32, parte5: 70, parte6: 63, parte7: 65 },
+      { estudiante: 'Neika Canco', global: 61, nivel: 'A2', parte1: 100, parte2: 90, parte3: 88, parte4: 32, parte5: 58, parte6: 21, parte7: 57 },
+      { estudiante: 'Brissbell Vasquez', global: 42, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 21, parte5: 47, parte6: 42, parte7: 48 },
+      { estudiante: 'Daniel Trillo', global: 80, nivel: 'B1', parte1: 100, parte2: 100, parte3: 88, parte4: 63, parte5: 82, parte6: 63, parte7: 73 },
+      { estudiante: 'Andrywl Londoño', global: 55, nivel: 'A2', parte1: 100, parte2: 45, parte3: 53, parte4: 42, parte5: 47, parte6: 42, parte7: 65 },
+      { estudiante: 'Enrique Solano', global: 48, nivel: 'A1', parte1: 42, parte2: 100, parte3: 70, parte4: 32, parte5: 12, parte6: 42, parte7: 48 },
+      { estudiante: 'Laura Durango', global: 61, nivel: 'A2', parte1: 84, parte2: 90, parte3: 35, parte4: 53, parte5: 70, parte6: 21, parte7: 65 },
+      { estudiante: 'Eyleen Torres', global: 52, nivel: 'A2', parte1: 84, parte2: 45, parte3: 100, parte4: 53, parte5: 47, parte6: 63, parte7: 16 },
+      { estudiante: 'Dilan Arias', global: 50, nivel: 'A2', parte1: 21, parte2: 90, parte3: 0, parte4: 32, parte5: 70, parte6: 21, parte7: 73 },
+      { estudiante: 'Ariadni Fontalvo', global: 46, nivel: 'A2', parte1: 0, parte2: 45, parte3: 88, parte4: 42, parte5: 47, parte6: 42, parte7: 48 },
+      { estudiante: 'Juan Jose Sierra', global: 50, nivel: 'A2', parte1: 21, parte2: 75, parte3: 53, parte4: 53, parte5: 82, parte6: 42, parte7: 24 },
+      { estudiante: 'Samer Lopez', global: 50, nivel: 'A2', parte1: 21, parte2: 100, parte3: 53, parte4: 42, parte5: 0, parte6: 42, parte7: 73 },
+      { estudiante: 'Mateo Gutieres', global: 44, nivel: 'A1', parte1: 84, parte2: 45, parte3: 35, parte4: 32, parte5: 23, parte6: 63, parte7: 48 },
+      { estudiante: 'Keller Peñalver', global: 29, nivel: 'Pre A1', parte1: 0, parte2: 75, parte3: 0, parte4: 11, parte5: 47, parte6: 42, parte7: 24 },
+      { estudiante: 'Maily Martines', global: 65, nivel: 'A2', parte1: 100, parte2: 75, parte3: 53, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
+      { estudiante: 'Riqueth Peñalver', global: 71, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 53, parte5: 35, parte6: 63, parte7: 81 },
+      { estudiante: 'Mariangel Rivera', global: 71, nivel: 'B1', parte1: 63, parte2: 100, parte3: 100, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
+      { estudiante: 'Isabel Sierra', global: 55, nivel: 'A2', parte1: 0, parte2: 75, parte3: 70, parte4: 63, parte5: 58, parte6: 21, parte7: 65 },
+      { estudiante: 'Yoner Vargas', global: 38, nivel: 'A1', parte1: 100, parte2: 15, parte3: 53, parte4: 42, parte5: 23, parte6: 42, parte7: 24 },
+      { estudiante: 'Gianna Oliveros', global: 63, nivel: 'A2', parte1: 63, parte2: 75, parte3: 100, parte4: 53, parte5: 58, parte6: 63, parte7: 48 },
+      { estudiante: 'Abraham Brito', global: 94, nivel: 'B1', parte1: 63, parte2: 100, parte3: 100, parte4: 95, parte5: 100, parte6: 100, parte7: 81 },
+      { estudiante: 'Aura Otero', global: 63, nivel: 'A2', parte1: 100, parte2: 60, parte3: 53, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
+      { estudiante: 'Adonay Ortega', global: 71, nivel: 'B1', parte1: 63, parte2: 100, parte3: 100, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
+      { estudiante: 'Mariangel Lobo', global: 78, nivel: 'B1', parte1: 84, parte2: 100, parte3: 88, parte4: 63, parte5: 82, parte6: 63, parte7: 73 },
+      { estudiante: 'Jose Angel Pelaez', global: 57, nivel: 'A2', parte1: 21, parte2: 90, parte3: 100, parte4: 84, parte5: 23, parte6: 21, parte7: 48 }
+    ];
+
+    const partKeys = ['parte1', 'parte2', 'parte3', 'parte4', 'parte5', 'parte6', 'parte7'];
+    const partLabels = ['Parte 1', 'Parte 2', 'Parte 3', 'Parte 4', 'Parte 5', 'Parte 6', 'Parte 7'];
+    const levelOrder = ['Pre A1', 'A1', 'A2', 'B1'];
+    const chartRegistry = {};
+    const metaViews = {
+      dashboard: ['● Dashboard Institucional', 'Análisis de Resultados de Inglés', 'Vista ejecutiva con KPIs, distribución por niveles, rendimiento por partes y lectura general del salón.', 'Lectura ejecutiva', 'KPIs principales, gráficos globales e insights automáticos.'],
+      competencias: ['◎ Vista de Competencias', 'Análisis por Partes del Examen', 'Profundiza en el desempeño de las siete partes, identifica brechas, dispersión y competencias prioritarias.', 'Competencias', 'Aquí se observa en qué parte falla o destaca más el grupo.'],
+      niveles: ['◌ Vista MCER', 'Distribución y Desempeño por Nivel', 'Segmentación por niveles Pre A1, A1, A2 y B1, con promedios e interpretación académica.', 'Niveles MCER', 'Compara grupos y detecta dónde debe enfocarse la intervención.'],
+      ranking: ['★ Vista Ranking', 'Ranking de Estudiantes', 'Clasificación del grupo por puntaje global y detección de estudiantes con mayor potencial de mejora.', 'Ranking', 'Top de estudiantes y oportunidades de avance.'],
+      riesgo: ['! Vista de Riesgo', 'Riesgo Académico e Intervención', 'Identifica estudiantes con bajo desempeño y propone acciones de refuerzo según prioridad.', 'Riesgo académico', 'Lista de estudiantes que necesitan acompañamiento.'],
+      datos: ['▦ Base de Datos', 'Base Completa de Estudiantes', 'Tabla interactiva con búsqueda, filtro por nivel y ordenamiento por columnas.', 'Base de datos', 'Consulta, filtra y ordena la información individual.']
+    };
+
+    const formatNumber = (value, decimals = 1) => Number(value).toFixed(decimals);
+    const average = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+    const countBy = (items, key) => items.reduce((acc, item) => ((acc[item[key]] = (acc[item[key]] || 0) + 1), acc), {});
+    const pct = (value, total) => `${((value / total) * 100).toFixed(1)}%`;
+
+    function activeStudents() {
+      const level = document.getElementById('levelFilter').value;
+      return level === 'all' ? students : students.filter(student => student.nivel === level);
+    }
+
+    function getPartAverages(rows = activeStudents()) {
+      return partKeys.map((key, index) => ({ key, label: partLabels[index], value: average(rows.map(student => student[key])), min: Math.min(...rows.map(s => s[key])), max: Math.max(...rows.map(s => s[key])) }));
+    }
+
+    function getModeLevel(rows = activeStudents()) {
+      const counts = countBy(rows, 'nivel');
+      return Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || ['-', 0];
+    }
+
+    function destroyChart(id) {
+      if (chartRegistry[id]) chartRegistry[id].destroy();
+    }
+
+    function makeChart(id, config) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      destroyChart(id);
+      chartRegistry[id] = new Chart(canvas, config);
+    }
+
+    function setHeader(view) {
+      const meta = metaViews[view];
+      document.getElementById('viewEyebrow').textContent = meta[0];
+      document.getElementById('viewTitle').textContent = meta[1];
+      document.getElementById('viewDescription').textContent = meta[2];
+      document.getElementById('sidebarTitle').textContent = meta[3];
+      document.getElementById('sidebarHint').textContent = meta[4];
+    }
+
+    function setKpis() {
+      const rows = activeStudents();
+      const globalAverage = average(rows.map(student => student.global));
+      const [modeLevel, modeCount] = getModeLevel(rows);
+      const partAverages = getPartAverages(rows);
+      const best = [...partAverages].sort((a, b) => b.value - a.value)[0];
+      const weak = [...partAverages].sort((a, b) => a.value - b.value)[0];
+      document.getElementById('studentCount').textContent = `${rows.length} estudiantes`;
+      document.getElementById('updatedAt').textContent = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+      document.getElementById('avgGlobal').textContent = formatNumber(globalAverage);
+      document.getElementById('modeLevel').textContent = modeLevel;
+      document.getElementById('modeLevelNote').textContent = `${modeCount} estudiantes se ubican en este nivel dentro del filtro activo.`;
+      document.getElementById('bestPart').textContent = best.label;
+      document.getElementById('bestPartNote').textContent = `Promedio: ${formatNumber(best.value)} puntos.`;
+      document.getElementById('weakPart').textContent = weak.label;
+      document.getElementById('weakPartNote').textContent = `Promedio: ${formatNumber(weak.value)} puntos.`;
+      document.getElementById('quickInsight').textContent = `El promedio global del grupo filtrado es ${formatNumber(globalAverage)} y el nivel predominante es ${modeLevel}.`;
+      document.getElementById('strengthInsight').textContent = `${best.label} lidera con ${formatNumber(best.value)} puntos de promedio; representa la competencia más sólida.`;
+      document.getElementById('improveInsight').textContent = `${weak.label} es la prioridad con ${formatNumber(weak.value)} puntos; requiere refuerzo focalizado.`;
+    }
+
+    function chartDefaults() {
+      Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+      Chart.defaults.color = '#6b7280';
+    }
+
+    function renderDashboardCharts() {
+      const rows = activeStudents();
+      const partAverages = getPartAverages(rows);
+      const levelCounts = countBy(rows, 'nivel');
+      const labels = levelOrder.filter(level => levelCounts[level]);
+      const values = labels.map(level => levelCounts[level]);
+      const minValue = Math.min(...partAverages.map(p => p.value));
+
+      makeChart('barChart', { type: 'bar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: partAverages.map(p => p.value === minValue ? '#b1121b' : '#0e3a5b'), borderRadius: 14, borderSkipped: false, barThickness: 38 }] }, options: baseBarOptions('Promedio') });
+      makeChart('donutChart', { type: 'doughnut', data: { labels, datasets: [{ data: values, backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5, hoverOffset: 8 }] }, options: donutOptions() });
+      makeChart('radarChart', { type: 'radar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio por parte', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: 'rgba(212,175,55,0.20)', borderColor: '#b1121b', pointBackgroundColor: '#b1121b', pointBorderColor: '#fff', borderWidth: 3 }] }, options: radarOptions() });
+      makeChart('histogramChart', { type: 'bar', data: histogramData(rows), options: baseBarOptions('Estudiantes') });
+    }
+
+    function baseBarOptions(label) {
+      return { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${label}: ${ctx.raw}` } } }, scales: { y: { beginAtZero: true, grid: { color: '#eadfbe' } }, x: { grid: { display: false }, ticks: { font: { weight: '800' } } } } };
+    }
+
+    function donutOptions() {
+      return { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { weight: '800' } } }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} estudiantes (${pct(ctx.raw, ctx.dataset.data.reduce((a,b)=>a+b,0))})` } } } };
+    }
+
+    function radarOptions() {
+      return { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: '800' } } }, tooltip: { backgroundColor: '#101827', padding: 12 } }, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20, backdropColor: 'transparent' }, angleLines: { color: '#e5e7eb' }, grid: { color: '#eadfbe' }, pointLabels: { color: '#0e3a5b', font: { weight: '900', size: 13 } } } } };
+    }
+
+    function histogramData(rows) {
+      const ranges = [{ label: '0-39', min: 0, max: 39 }, { label: '40-59', min: 40, max: 59 }, { label: '60-79', min: 60, max: 79 }, { label: '80-100', min: 80, max: 100 }];
+      return { labels: ranges.map(r => r.label), datasets: [{ data: ranges.map(r => rows.filter(s => s.global >= r.min && s.global <= r.max).length), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] };
+    }
+
+    function renderCompetencias() {
+      const rows = activeStudents();
+      const parts = getPartAverages(rows).sort((a, b) => b.value - a.value);
+      const weakest = [...parts].sort((a, b) => a.value - b.value)[0];
+      document.getElementById('competencyRanking').innerHTML = parts.map((p, i) => `<div class="progress-item"><div class="progress-top"><span>${i + 1}. ${p.label}</span><span>${formatNumber(p.value)}</span></div><div class="progress-track"><div class="progress-fill" style="width:${p.value}%"></div></div></div>`).join('');
+      document.getElementById('gapList').innerHTML = parts.map(p => { const gap = p.value - 70; return `<div class="list-row"><div><strong>${p.label}</strong><span>${gap >= 0 ? 'Supera' : 'Está por debajo de'} la meta institucional de 70.</span></div><div class="metric">${gap >= 0 ? '+' : ''}${formatNumber(gap)}</div></div>`; }).join('');
+      document.getElementById('competencyDiagnosis').textContent = `La competencia crítica es ${weakest.label}, con promedio ${formatNumber(weakest.value)}. Se recomienda trabajar ejercicios guiados, retroalimentación inmediata y práctica por niveles.`;
+      makeChart('rangeChart', { type: 'bar', data: { labels: partLabels, datasets: [{ label: 'Máximo', data: partKeys.map(k => Math.max(...rows.map(s => s[k]))), backgroundColor: 'rgba(14,58,91,0.14)', borderRadius: 12 }, { label: 'Promedio', type: 'line', data: getPartAverages(rows).map(p => +formatNumber(p.value)), borderColor: '#b1121b', backgroundColor: '#b1121b', tension: 0.35, borderWidth: 3 }, { label: 'Mínimo', data: partKeys.map(k => Math.min(...rows.map(s => s[k]))), backgroundColor: 'rgba(212,175,55,0.20)', borderRadius: 12 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, x: { grid: { display: false } } } } });
+      makeChart('levelPartChart', { type: 'bar', data: { labels: partLabels, datasets: levelOrder.filter(l => rows.some(s => s.nivel === l)).map((level, idx) => ({ label: level, data: partKeys.map(k => +formatNumber(average(rows.filter(s => s.nivel === level).map(s => s[k])))), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'][idx], borderRadius: 10 })) }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, x: { grid: { display: false } } } } });
+    }
+
+    function renderNiveles() {
+      const rows = activeStudents();
+      const counts = countBy(rows, 'nivel');
+      document.getElementById('b1Count').textContent = counts.B1 || 0;
+      document.getElementById('a2Count').textContent = counts.A2 || 0;
+      document.getElementById('a1Count').textContent = counts.A1 || 0;
+      document.getElementById('preA1Count').textContent = counts['Pre A1'] || 0;
+      const labels = levelOrder.filter(l => rows.some(s => s.nivel === l));
+      makeChart('levelAverageChart', { type: 'bar', data: { labels, datasets: [{ data: labels.map(l => +formatNumber(average(rows.filter(s => s.nivel === l).map(s => s.global)))), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] }, options: baseBarOptions('Promedio') });
+      makeChart('levelDonutChart', { type: 'doughnut', data: { labels, datasets: [{ data: labels.map(l => counts[l]), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5 }] }, options: donutOptions() });
+      document.getElementById('levelInsights').innerHTML = labels.map(level => { const group = rows.filter(s => s.nivel === level); const avg = average(group.map(s => s.global)); return `<div class="list-row"><div><strong>${level}</strong><span>${group.length} estudiantes, equivalente al ${pct(group.length, rows.length)} del grupo filtrado.</span></div><div class="metric">${formatNumber(avg)}</div></div>`; }).join('');
+    }
+
+    function renderRanking() {
+      const rows = activeStudents();
+      const sorted = [...rows].sort((a, b) => b.global - a.global);
+      document.getElementById('topStudents').innerHTML = sorted.slice(0, 10).map((s, i) => `<div class="list-row"><div><strong>${i + 1}. ${s.estudiante}</strong><span>Nivel ${s.nivel}</span></div><div class="metric">${s.global}</div></div>`).join('');
+      const weakKey = [...getPartAverages(rows)].sort((a, b) => a.value - b.value)[0].key;
+      const potential = rows.map(s => ({ ...s, lowPart: s[weakKey], gap: s.global - s[weakKey] })).sort((a, b) => b.gap - a.gap).slice(0, 10);
+      document.getElementById('improvementStudents').innerHTML = potential.map(s => `<div class="list-row"><div><strong>${s.estudiante}</strong><span>Brecha entre global y competencia débil: ${s.gap} puntos.</span></div><div class="metric">${s.lowPart}</div></div>`).join('');
+      makeChart('rankingChart', { type: 'bar', data: { labels: sorted.map(s => s.estudiante), datasets: [{ label: 'Puntaje global', data: sorted.map(s => s.global), backgroundColor: sorted.map(s => s.global >= 80 ? '#1d6f42' : s.global >= 60 ? '#0e3a5b' : s.global >= 45 ? '#b7791f' : '#b1121b'), borderRadius: 10, borderSkipped: false }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12 } }, scales: { x: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 } } } } } });
+    }
+
+    function renderRiesgo() {
+      const rows = activeStudents();
+      const high = rows.filter(s => s.global < 45);
+      const medium = rows.filter(s => s.global >= 45 && s.global < 60);
+      const stable = rows.filter(s => s.global >= 60 && s.global < 80);
+      const excellent = rows.filter(s => s.global >= 80);
+      document.getElementById('highRiskCount').textContent = high.length;
+      document.getElementById('mediumRiskCount').textContent = medium.length;
+      document.getElementById('stableCount').textContent = stable.length;
+      document.getElementById('excellentCount').textContent = excellent.length;
+      document.getElementById('riskStudents').innerHTML = (high.length ? high : medium.slice(0, 8)).sort((a,b)=>a.global-b.global).map(s => `<div class="list-row"><div><strong>${s.estudiante}</strong><span>Nivel ${s.nivel}. Requiere seguimiento por puntaje global bajo.</span></div><div class="metric">${s.global}</div></div>`).join('') || '<div class="empty-state">No hay estudiantes en riesgo dentro del filtro activo.</div>';
+      document.getElementById('interventionPlan').innerHTML = `<div class="list-row"><div><strong>1. Refuerzo focalizado</strong><span>Trabajar la competencia más baja con talleres cortos y evidencias semanales.</span></div><div class="metric">P1</div></div><div class="list-row"><div><strong>2. Tutoría por pares</strong><span>Asignar estudiantes B1 como apoyo en ejercicios guiados.</span></div><div class="metric">P2</div></div><div class="list-row"><div><strong>3. Evaluación formativa</strong><span>Aplicar micropruebas por parte para medir avance.</span></div><div class="metric">P3</div></div>`;
+      const weak = [...getPartAverages(rows)].sort((a,b)=>a.value-b.value)[0];
+      makeChart('riskScatterChart', { type: 'scatter', data: { datasets: [{ label: `Global vs ${weak.label}`, data: rows.map(s => ({ x: s.global, y: s[weak.key], estudiante: s.estudiante, nivel: s.nivel })), backgroundColor: rows.map(s => s.global < 45 ? '#b1121b' : s.global < 60 ? '#d4af37' : '#0e3a5b'), pointRadius: 6, pointHoverRadius: 9 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${ctx.raw.estudiante}: Global ${ctx.raw.x}, ${weak.label} ${ctx.raw.y}` } } }, scales: { x: { beginAtZero: true, max: 100, title: { display: true, text: 'Puntaje global' }, grid: { color: '#eadfbe' } }, y: { beginAtZero: true, max: 100, title: { display: true, text: weak.label }, grid: { color: '#eadfbe' } } } } });
+    }
+
+    let currentSort = { key: 'global', direction: 'desc' };
+    function levelClass(level) { return level.toLowerCase().replace(' ', '-'); }
+    function scoreCell(value) { return `<div class="score-bar"><span>${value}</span><div class="mini-track"><div class="mini-fill" style="width:${value}%"></div></div></div>`; }
+    function sortRows(rows) { const { key, direction } = currentSort; const modifier = direction === 'asc' ? 1 : -1; return [...rows].sort((a,b) => typeof a[key] === 'number' ? (a[key]-b[key])*modifier : String(a[key]).localeCompare(String(b[key]), 'es')*modifier); }
+    function filteredTableRows() { const q = document.getElementById('searchInput')?.value.trim().toLowerCase() || ''; const level = document.getElementById('tableLevelFilter')?.value || 'all'; return students.filter(s => (level === 'all' || s.nivel === level) && (s.estudiante.toLowerCase().includes(q) || s.nivel.toLowerCase().includes(q))); }
+    function renderTable() { const body = document.getElementById('tableBody'); if (!body) return; const rows = sortRows(filteredTableRows()); body.innerHTML = rows.map(s => `<tr><td class="student-name">${s.estudiante}</td><td>${scoreCell(s.global)}</td><td><span class="level ${levelClass(s.nivel)}">${s.nivel}</span></td><td>${s.parte1}</td><td>${s.parte2}</td><td>${s.parte3}</td><td>${s.parte4}</td><td>${s.parte5}</td><td>${s.parte6}</td><td>${s.parte7}</td></tr>`).join('') || `<tr><td colspan="10" class="empty-state">No hay resultados para el filtro aplicado.</td></tr>`; }
+
+    function populateFilters() {
+      const counts = countBy(students, 'nivel');
+      ['levelFilter', 'tableLevelFilter'].forEach(id => {
+        const select = document.getElementById(id);
+        if (!select) return;
+        levelOrder.filter(level => counts[level]).forEach(level => {
+          const option = document.createElement('option'); option.value = level; option.textContent = `${level} (${counts[level]})`; select.appendChild(option);
+        });
+      });
+    }
+
+    function renderActiveView() {
+      const view = document.querySelector('.nav-item.active').dataset.view;
+      setKpis();
+      if (view === 'dashboard') renderDashboardCharts();
+      if (view === 'competencias') renderCompetencias();
+      if (view === 'niveles') renderNiveles();
+      if (view === 'ranking') renderRanking();
+      if (view === 'riesgo') renderRiesgo();
+      if (view === 'datos') renderTable();
+    }
+
+    function setupInteractions() {
+      const toggleButton = document.getElementById('toggleSidebar');
+      const app = document.getElementById('app');
+      const sidebar = document.querySelector('.sidebar');
+
+      function isMobileMenu() {
+        return window.matchMedia('(max-width: 900px)').matches;
+      }
+
+      function closeMobileMenu() {
+        sidebar.classList.remove('mobile-open');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.setAttribute('aria-label', 'Abrir menú');
+      }
+
+      toggleButton.addEventListener('click', () => {
+        if (isMobileMenu()) {
+          const isOpen = sidebar.classList.toggle('mobile-open');
+          toggleButton.setAttribute('aria-expanded', String(isOpen));
+          toggleButton.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+          return;
+        }
+        app.classList.toggle('collapsed');
+      });
+
+      window.addEventListener('resize', () => {
+        if (!isMobileMenu()) closeMobileMenu();
+      });
+      document.querySelectorAll('.nav-item').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+          document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+          button.classList.add('active');
+          document.getElementById(`view-${button.dataset.view}`).classList.add('active');
+          setHeader(button.dataset.view);
+          renderActiveView();
+          if (window.matchMedia('(max-width: 900px)').matches) closeMobileMenu();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+      document.getElementById('levelFilter').addEventListener('change', renderActiveView);
+      document.getElementById('searchInput').addEventListener('input', renderTable);
+      document.getElementById('tableLevelFilter').addEventListener('change', renderTable);
+      document.querySelectorAll('th[data-key]').forEach(th => th.addEventListener('click', () => { const key = th.dataset.key; currentSort = currentSort.key === key ? { key, direction: currentSort.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: key === 'estudiante' || key === 'nivel' ? 'asc' : 'desc' }; renderTable(); }));
+    }
+
+    chartDefaults();
+    populateFilters();
+    setHeader('dashboard');
+    setKpis();
+    renderDashboardCharts();
+    renderTable();
+    setupInteractions();
+  </script>
+</body>
+</html>
