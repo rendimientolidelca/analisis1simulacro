@@ -1,1389 +1,2090 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Analítico - Inglés</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://i.ibb.co" crossorigin>
-  <link rel="dns-prefetch" href="//i.ibb.co">
-  <link rel="preload" as="image" href="https://i.ibb.co/C3tbd1tJ/Dise-o-sin-t-tulo-100-1.png" fetchpriority="high">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    :root {
-      --bg: #f7f3e8;
-      --surface: #ffffff;
-      --surface-soft: #fffaf0;
-      --text: #1f2933;
-      --muted: #6f6a5d;
-      --line: #eadfbe;
-      --accent: #b1121b;
-      --accent-soft: #fff1cc;
-      --accent-dark: #7f0d14;
-      --gold: #d4af37;
-      --gold-soft: #fff3c4;
-      --navy: #0e3a5b;
-      --navy-soft: #dbeafe;
-      --dark: #101827;
-      --green: #1d6f42;
-      --blue: #0e3a5b;
-      --amber: #b7791f;
-      --shadow: 0 18px 45px rgba(78, 52, 13, 0.10);
-      --shadow-soft: 0 10px 24px rgba(78, 52, 13, 0.08);
-      --radius: 22px;
-      --sidebar-width: 300px;
-      --sidebar-collapsed: 92px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html {
-      width: 100%;
-      min-width: 320px;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      width: 100%;
-      min-height: 100vh;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at top left, #fffef8 0, var(--bg) 42%, #efe2b8 100%);
-      color: var(--text);
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    img, canvas, svg {
-      max-width: 100%;
-    }
-
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-
-    .app {
-      display: grid;
-      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-      min-height: 100vh;
-      width: 100%;
-      max-width: 100vw;
-      transition: grid-template-columns 0.25s ease;
-    }
-
-    .app.collapsed { grid-template-columns: var(--sidebar-collapsed) minmax(0, 1fr); }
-
-    .sidebar {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      padding: 26px 18px;
-      background: linear-gradient(180deg, #8f0f16 0%, #641018 52%, #0e3a5b 100%);
-      color: #fff;
-      border-right: 1px solid rgba(255, 243, 196, 0.14);
-      overflow: hidden;
-    }
-
-    .sidebar-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .app.collapsed .sidebar-top { justify-content: center; }
-
-    .brand { display: flex; align-items: center; gap: 12px; min-height: 58px; min-width: 0; }
-    .brand-logo {
-      width: 58px; height: 58px; display: grid; place-items: center;
-      border-radius: 18px; background: linear-gradient(135deg, #fff8d6, #d4af37);
-      box-shadow: 0 12px 28px rgba(212, 175, 55, 0.28);
-      border: 2px solid rgba(255, 231, 146, 0.85);
-      overflow: hidden; flex: 0 0 auto;
-    }
-
-    .brand-logo img {
-      width: 100%; height: 100%; object-fit: contain; display: block;
-      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
-    }
-
-    .brand-text, .nav-text {
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      white-space: nowrap;
-      min-width: 0;
-    }
-
-    .nav-text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .sidebar-footer {
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      white-space: normal;
-      overflow-wrap: anywhere;
-    }
-
-    .brand-text h1 { font-size: 16px; line-height: 1.1; letter-spacing: -0.03em; color: #fff8d6; }
-    .brand-text p { margin-top: 4px; font-size: 12px; color: rgba(255, 243, 196, 0.78); }
-
-    .app.collapsed .brand-text,
-    .app.collapsed .nav-text,
-    .app.collapsed .sidebar-footer {
-      opacity: 0; transform: translateX(-8px); pointer-events: none;
-    }
-
-    .toggle-btn {
-      width: 44px; height: 44px; border: 0; border-radius: 14px;
-      background: rgba(255, 243, 196, 0.13); color: #fff8d6; font-size: 20px;
-      transition: 0.2s ease;
-    }
-    .toggle-btn:hover { background: rgba(255, 243, 196, 0.22); }
-    .app.collapsed .toggle-btn { position: absolute; bottom: 24px; left: 22px; }
-
-    .nav { margin-top: 34px; display: grid; gap: 10px; }
-    .nav-item {
-      width: 100%; display: flex; align-items: center; gap: 12px;
-      padding: 13px 14px; border: 0; border-radius: 16px;
-      background: transparent; color: rgba(255, 248, 214, 0.78);
-      font-size: 14px; font-weight: 700; text-align: left; transition: 0.18s ease;
-      min-width: 0; overflow: hidden;
-    }
-    .nav-item:hover { background: rgba(255, 243, 196, 0.12); color: #fff8d6; transform: translateX(2px); }
-    .nav-item.active {
-      color: #fff8d6; background: rgba(212, 175, 55, 0.20);
-      box-shadow: inset 3px 0 0 var(--gold);
-    }
-    .nav-icon { width: 24px; text-align: center; flex: 0 0 auto; }
-
-    .sidebar-footer {
-      position: absolute; left: 18px; right: 18px; bottom: 26px;
-      padding: 16px; border-radius: 18px;
-      background: rgba(255, 243, 196, 0.10); border: 1px solid rgba(255, 243, 196, 0.16);
-      max-width: calc(100% - 36px);
-    }
-    .sidebar-footer strong { display: block; margin-bottom: 6px; font-size: 13px; color: #fff8d6; line-height: 1.25; max-width: 100%; }
-    .sidebar-footer span { display: block; color: rgba(255, 243, 196, 0.72); font-size: 12px; line-height: 1.45; max-width: 100%; }
-
-    .main { padding: clamp(16px, 2.4vw, 30px); min-width: 0; width: 100%; max-width: 100vw; }
-
-    .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; min-width: 0; }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; margin-bottom: 12px;
-      border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark);
-      font-size: 12px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase;
-    }
-    .title { min-width: 0; }
-    .title h2 { font-size: clamp(25px, 4vw, 42px); line-height: 1.05; letter-spacing: -0.055em; color: #171a20; overflow-wrap: anywhere; }
-    .title p { max-width: 840px; margin-top: 12px; color: var(--muted); font-size: clamp(13px, 1.6vw, 15px); line-height: 1.6; }
-    .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
-
-    .pill, .select-pill {
-      padding: 12px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft); font-size: 13px; color: var(--muted); font-weight: 800; white-space: nowrap;
-      max-width: 100%;
-    }
-    .select-pill { outline: none; color: #374151; }
-
-    .view { display: none; animation: fadeIn 0.25s ease; }
-    .view.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    .card {
-      background: rgba(255,255,255,0.95); border: 1px solid rgba(234, 223, 190, 0.95);
-      border-radius: var(--radius); box-shadow: var(--shadow-soft); backdrop-filter: blur(14px);
-    }
-
-    .grid-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
-    .kpi-card { padding: 22px; position: relative; overflow: hidden; min-height: 154px; }
-    .kpi-card::after {
-      content: ''; position: absolute; width: 120px; height: 120px; border-radius: 999px;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.22), rgba(177, 18, 27, 0)); top: -30px; right: -34px;
-    }
-    .kpi-label { color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
-    .kpi-value { margin-top: 15px; font-size: 34px; line-height: 1; font-weight: 900; letter-spacing: -0.055em; color: #151820; }
-    .kpi-note { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.45; }
-    .kpi-badge { display: inline-flex; align-items: center; margin-top: 16px; padding: 7px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); font-weight: 900; font-size: 12px; }
-
-    .summary-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
-    .insight { padding: 20px; }
-    .insight strong { display: block; font-size: 14px; margin-bottom: 8px; color: #171a20; }
-    .insight span, .insight li { color: var(--muted); font-size: 13px; line-height: 1.55; }
-    .insight ul { padding-left: 18px; display: grid; gap: 6px; }
-
-    .charts-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
-    .charts-grid.equal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .chart-card { padding: clamp(16px, 2vw, 22px); min-height: clamp(340px, 42vw, 390px); min-width: 0; overflow: hidden; }
-    .chart-card.tall { min-height: clamp(410px, 48vw, 470px); }
-    .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; min-width: 0; }
-    .chart-head h3 { font-size: clamp(15px, 2vw, 17px); letter-spacing: -0.02em; overflow-wrap: anywhere; }
-    .chart-head p { margin-top: 6px; color: var(--muted); font-size: clamp(12px, 1.6vw, 13px); line-height: 1.45; }
-    .chart-tag { padding: 7px 10px; border-radius: 999px; background: #f3f4f6; color: #4b5563; font-size: 12px; font-weight: 900; white-space: nowrap; flex: 0 0 auto; }
-    .chart-wrap { position: relative; height: clamp(260px, 35vw, 300px); width: 100%; min-width: 0; }
-    .chart-card.tall .chart-wrap { height: clamp(320px, 42vw, 380px); }
-    .chart-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
-
-    .analysis-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 1.5vw, 18px); margin-bottom: 18px; }
-    .panel { padding: 22px; }
-    .panel h3 { font-size: 17px; letter-spacing: -0.02em; margin-bottom: 14px; }
-    .list { display: grid; gap: 12px; }
-    .list-row {
-      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px;
-      padding: 13px 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff;
-    }
-    .list-row strong { font-size: 14px; color: #171a20; }
-    .list-row span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
-    .metric { font-weight: 900; color: var(--accent); white-space: nowrap; }
-
-    .progress-item { display: grid; gap: 8px; }
-    .progress-top { display: flex; justify-content: space-between; color: #374151; font-weight: 800; font-size: 13px; }
-    .progress-track { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #b1121b, #d4af37); }
-
-    .table-card { padding: 0; overflow: hidden; }
-    .table-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fbfbfc); }
-    .table-toolbar h3 { font-size: 17px; letter-spacing: -0.02em; }
-    .table-toolbar p { margin-top: 5px; color: var(--muted); font-size: 13px; }
-    .toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
-    .search { width: min(340px, 100%); display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
-    .search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 14px; }
-    .table-scroll { max-height: 540px; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-inline: contain; }
-    .table-scroll::after { content: 'Desliza horizontalmente para ver todas las columnas'; display: none; padding: 10px 14px; color: var(--muted); font-size: 12px; background: #fffaf0; border-top: 1px solid var(--line); }
-    table { width: 100%; border-collapse: collapse; min-width: 980px; }
-    thead th { position: sticky; top: 0; z-index: 2; padding: 14px 16px; background: #f9fafb; color: #4b5563; border-bottom: 1px solid var(--line); font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; text-align: left; cursor: pointer; user-select: none; }
-    tbody td { padding: 15px 16px; border-bottom: 1px solid #eef0f3; color: #30343b; font-size: 14px; white-space: nowrap; }
-    tbody tr:nth-child(even) { background: #fcfcfd; }
-    tbody tr:hover { background: #fff7f7; }
-    .student-name { font-weight: 900; color: #171a20; }
-
-    .level { display: inline-flex; justify-content: center; min-width: 72px; padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; background: #f3f4f6; color: #374151; }
-    .level.b1 { background: #dcfce7; color: #166534; }
-    .level.a2 { background: #e0f2fe; color: #075985; }
-    .level.a1 { background: #fef3c7; color: #92400e; }
-    .level.pre-a1 { background: #fee2e2; color: #991b1b; }
-
-    .score-bar { display: flex; align-items: center; gap: 9px; }
-    .mini-track { width: 78px; height: 8px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
-    .mini-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #b1121b, #d4af37); }
-
-    .empty-state { padding: 30px; color: var(--muted); text-align: center; }
-
-    .interactive-hint {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .student-report-trigger {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 14px;
-      align-items: center;
-      margin-bottom: 18px;
-      padding: 18px;
-    }
-
-    .student-report-trigger h3 {
-      font-size: 17px;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
-
-    .student-report-trigger p {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .primary-btn {
-      border: 0;
-      padding: 12px 16px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--accent), var(--gold));
-      color: #fff;
-      font-size: 13px;
-      font-weight: 900;
-      box-shadow: var(--shadow-soft);
-      transition: transform 0.18s ease, filter 0.18s ease;
-      white-space: nowrap;
-    }
-
-    .primary-btn:hover { transform: translateY(-1px); filter: brightness(1.02); }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 3000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(12px, 3vw, 28px);
-      background: rgba(16, 24, 39, 0.58);
-      backdrop-filter: blur(10px);
-    }
-
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      width: min(980px, 100%);
-      max-height: min(86vh, 820px);
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      overflow: hidden;
-      border-radius: 26px;
-      background: rgba(255,255,255,0.98);
-      border: 1px solid rgba(234, 223, 190, 0.95);
-      box-shadow: 0 30px 90px rgba(16, 24, 39, 0.28);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 22px 24px 16px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, #fffef8, #fffaf0);
-    }
-
-    .modal-title h3 {
-      font-size: clamp(18px, 3vw, 24px);
-      line-height: 1.1;
-      letter-spacing: -0.035em;
-      color: #171a20;
-    }
-
-    .modal-title p {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .modal-close {
-      width: 40px;
-      height: 40px;
-      border: 0;
-      border-radius: 14px;
-      background: #fff1cc;
-      color: var(--accent-dark);
-      font-size: 22px;
-      font-weight: 900;
-      flex: 0 0 auto;
-    }
-
-    .modal-toolbar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--line);
-      background: #fff;
-    }
-
-    .modal-search {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fff;
-    }
-
-    .modal-search input {
-      width: 100%;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: 14px;
-    }
-
-    .modal-body {
-      overflow: auto;
-      padding: 18px 24px 24px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .modal-stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .modal-stat {
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fffaf0;
-    }
-
-    .modal-stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .modal-stat strong {
-      display: block;
-      margin-top: 8px;
-      color: #171a20;
-      font-size: 22px;
-      line-height: 1;
-      font-weight: 900;
-    }
-
-    .modal-table-wrap {
-      overflow: auto;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .modal-table {
-      min-width: 760px;
-    }
-
-    .student-report {
-      display: grid;
-      gap: 16px;
-    }
-
-    .report-hero {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 16px;
-      align-items: center;
-      padding: 18px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #fffaf0, #fff1cc);
-      border: 1px solid var(--line);
-    }
-
-    .report-hero h4 {
-      font-size: 24px;
-      letter-spacing: -0.04em;
-      color: #171a20;
-    }
-
-    .report-hero p {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .report-score {
-      display: grid;
-      place-items: center;
-      width: 88px;
-      height: 88px;
-      border-radius: 28px;
-      background: #fff;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
-      color: var(--accent);
-      font-size: 30px;
-      font-weight: 900;
-    }
-
-    .report-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .report-card {
-      padding: 15px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fff;
-    }
-
-    .report-card span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .report-card strong {
-      display: block;
-      margin-top: 8px;
-      font-size: 22px;
-      color: #171a20;
-    }
-
-    .part-report-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .part-report-row {
-      display: grid;
-      grid-template-columns: 92px 1fr 54px;
-      gap: 12px;
-      align-items: center;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fff;
-    }
-
-    .clickable-list-row {
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease;
-    }
-
-    .clickable-list-row:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-soft);
-    }
-
-    @media (max-width: 1180px) {
-      .grid-kpis, .summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .charts-grid, .charts-grid.equal, .analysis-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 900px) {
-      .app, .app.collapsed { grid-template-columns: 1fr; }
-      .sidebar {
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        height: auto;
-        padding: 14px 16px;
-        border-right: 0;
-        border-bottom: 1px solid rgba(255, 243, 196, 0.14);
-        overflow: visible;
-      }
-      .sidebar-top { gap: 10px; }
-      .app.collapsed .sidebar-top { justify-content: space-between; }
-      .brand-logo { width: 52px; height: 52px; border-radius: 16px; }
-      .brand-text h1 { font-size: 15px; }
-
-      .nav {
-        display: none;
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 14px;
-        max-height: calc(100vh - 96px);
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 10px;
-        border-radius: 20px;
-        background: rgba(16, 24, 39, 0.20);
-        border: 1px solid rgba(255, 243, 196, 0.14);
-        box-shadow: 0 18px 35px rgba(16, 24, 39, 0.22);
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .sidebar.mobile-open .nav {
-        display: grid;
-      }
-
-      .nav::-webkit-scrollbar { width: 6px; }
-      .nav::-webkit-scrollbar-thumb { background: rgba(255, 243, 196, 0.28); border-radius: 999px; }
-      .nav-item {
-        width: 100%;
-        min-width: 0;
-        justify-content: flex-start;
-        padding: 13px 14px;
-        border-radius: 15px;
-      }
-      .nav-icon { width: 24px; }
-      .nav-text { opacity: 1; transform: none; pointer-events: auto; white-space: normal; }
-      .sidebar-footer { display: none; }
-      .app.collapsed .brand-text, .app.collapsed .nav-text { opacity: 1; transform: none; pointer-events: auto; }
-      .app.collapsed .toggle-btn { position: static; }
-      .toggle-btn { flex: 0 0 auto; }
-      .toggle-btn[aria-expanded="true"] { background: rgba(212, 175, 55, 0.28); color: #ffffff; }
-      .main { padding: 18px; }
-      .header, .table-toolbar { flex-direction: column; align-items: stretch; }
-      .header-actions, .toolbar-actions { justify-content: flex-start; width: 100%; }
-      .select-pill, .pill { flex: 1 1 auto; text-align: center; }
-      .chart-head { flex-direction: column; gap: 10px; }
-      .chart-tag { align-self: flex-start; }
-      .table-scroll::after { display: block; }
-    }
-
-    @media (max-width: 640px) {
-      :root { --radius: 18px; }
-      .student-report-trigger { grid-template-columns: 1fr; }
-      .primary-btn { width: 100%; }
-      .modal-overlay { align-items: flex-end; padding: 0; }
-      .modal { width: 100%; max-height: 92vh; border-radius: 24px 24px 0 0; }
-      .modal-header { padding: 18px 16px 14px; }
-      .modal-toolbar { padding: 14px 16px; }
-      .modal-body { padding: 14px 16px 18px; }
-      .modal-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .report-hero { grid-template-columns: 1fr; }
-      .report-score { width: 76px; height: 76px; border-radius: 24px; font-size: 26px; }
-      .report-grid { grid-template-columns: 1fr; }
-      .part-report-row { grid-template-columns: 78px 1fr 42px; gap: 8px; }
-      .main { padding: 14px; }
-      .sidebar { padding: 14px; }
-      .toggle-btn { width: 42px; height: 42px; flex: 0 0 auto; }
-      .brand { gap: 10px; }
-      .brand-logo { width: 48px; height: 48px; }
-      .brand-text h1 { font-size: 14px; }
-      .brand-text p { font-size: 11px; }
-      .eyebrow { font-size: 10px; padding: 6px 10px; }
-      .title h2 { font-size: clamp(23px, 8vw, 34px); letter-spacing: -0.04em; }
-      .title p { font-size: 13px; }
-      .header-actions { gap: 8px; }
-      .pill, .select-pill { width: 100%; padding: 11px 13px; font-size: 12px; }
-      .grid-kpis, .summary-strip, .charts-grid, .charts-grid.equal, .analysis-grid { grid-template-columns: 1fr; gap: 12px; }
-      .kpi-card { padding: 18px; min-height: auto; }
-      .kpi-value { font-size: 30px; }
-      .insight, .panel, .chart-card { padding: 16px; }
-      .chart-card { min-height: 330px; }
-      .chart-card.tall { min-height: 390px; }
-      .chart-wrap { height: 250px; }
-      .chart-card.tall .chart-wrap { height: 310px; }
-      .list-row { grid-template-columns: 1fr; gap: 8px; }
-      .metric { justify-self: start; }
-      .toolbar-actions { flex-direction: column; align-items: stretch; }
-      .search { width: 100%; }
-      .table-toolbar { padding: 16px; }
-      .table-scroll { max-height: 66vh; }
-      table { min-width: 820px; }
-      thead th, tbody td { padding: 12px 12px; font-size: 12px; }
-      .mini-track { width: 52px; }
-    }
-
-    @media (max-width: 420px) {
-      .main { padding: 12px; }
-      .sidebar { padding: 12px; }
-      .brand-logo { width: 44px; height: 44px; }
-      .brand-text h1 { max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .nav-item { min-width: 132px; font-size: 12px; padding: 11px 12px; }
-      .chart-card { min-height: 310px; }
-      .chart-wrap { height: 230px; }
-      .chart-card.tall .chart-wrap { height: 285px; }
-      .kpi-value { font-size: 28px; }
-      table { min-width: 760px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Inglés B1 - Luthiers (Parte 4)</title>
+    <!-- Tailwind CSS para diseño moderno y fluido -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter para UI, Lora para simular la tipografía de lectura del examen real -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome para íconos interactivos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .exam-text {
+            font-family: 'Lora', Georgia, serif;
+        }
+        /* Efecto de borde tipo hoja de examen real */
+        .exam-border {
+            border: 3px solid #1a1a1a;
+        }
+        /* Personalización de transiciones de burbujas */
+        .bubble-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Scrollbar personalizado para las explicaciones */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Subrayado punteado pedagógico para palabras traducibles */
+        .dict-word {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-decoration-color: #94a3b8;
+            text-underline-offset: 4px;
+            cursor: help;
+        }
+        .dict-word:hover {
+            text-decoration-color: #2563eb;
+            background-color: #fef08a; /* Soft yellow highlight */
+            color: #1e3a8a;
+            border-radius: 2px;
+        }
+    </style>
 </head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
-<body>
-  <div class="app" id="app">
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="brand">
-          <div class="brand-logo"><img src="https://i.ibb.co/C3tbd1tJ/Dise-o-sin-t-tulo-100-1.png" alt="Logo Liceo del Caribe" width="58" height="58" fetchpriority="high" decoding="async"></div>
-          <div class="brand-text">
-            <h1>Liceo del Caribe</h1>
-            <p>English Analytics</p>
-          </div>
-        </div>
-        <button class="toggle-btn" id="toggleSidebar" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebarNav">☰</button>
-      </div>
-
-      <nav class="nav" id="sidebarNav" aria-label="Vistas del dashboard">
-        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">◼</span><span class="nav-text">Dashboard</span></button>
-        <button class="nav-item" data-view="competencias"><span class="nav-icon">◎</span><span class="nav-text">Competencias</span></button>
-        <button class="nav-item" data-view="niveles"><span class="nav-icon">◌</span><span class="nav-text">Niveles MCER</span></button>
-        <button class="nav-item" data-view="ranking"><span class="nav-icon">★</span><span class="nav-text">Ranking</span></button>
-        <button class="nav-item" data-view="riesgo"><span class="nav-icon">!</span><span class="nav-text">Riesgo académico</span></button>
-        <button class="nav-item" data-view="datos"><span class="nav-icon">▦</span><span class="nav-text">Base de datos</span></button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <strong id="sidebarTitle">Lectura ejecutiva</strong>
-        <span id="sidebarHint">Selecciona una vista para explorar el rendimiento desde diferentes ángulos.</span>
-      </div>
-    </aside>
-
-    <main class="main">
-      <header class="header">
-        <section class="title">
-          <div class="eyebrow" id="viewEyebrow">● Dashboard Institucional</div>
-          <h2 id="viewTitle">Análisis de Resultados de Inglés</h2>
-          <p id="viewDescription">Visualización profesional del desempeño por estudiante, nivel MCER y partes del examen. El tablero identifica fortalezas, brechas y prioridades de mejora para la toma de decisiones académicas.</p>
-        </section>
-        <div class="header-actions">
-          <div class="pill" id="studentCount">46 estudiantes</div>
-          <select class="select-pill" id="levelFilter" aria-label="Filtrar por nivel">
-            <option value="all">Todos los niveles</option>
-          </select>
-          <div class="pill" id="updatedAt">Actualizado hoy</div>
-        </div>
-      </header>
-
-      <section class="view active" id="view-dashboard">
-        <section class="grid-kpis">
-          <article class="card kpi-card"><div class="kpi-label">Promedio global</div><div class="kpi-value" id="avgGlobal">--</div><div class="kpi-note">Media general del salón según puntaje global.</div><div class="kpi-badge">Indicador principal</div></article>
-          <article class="card kpi-card"><div class="kpi-label">Nivel predominante</div><div class="kpi-value" id="modeLevel">--</div><div class="kpi-note" id="modeLevelNote">Moda de los niveles MCER.</div><div class="kpi-badge">Distribución MCER</div></article>
-          <article class="card kpi-card"><div class="kpi-label">Mejor competencia</div><div class="kpi-value" id="bestPart">--</div><div class="kpi-note" id="bestPartNote">Parte con mayor promedio.</div><div class="kpi-badge">Fortaleza</div></article>
-          <article class="card kpi-card"><div class="kpi-label">Área de mejora</div><div class="kpi-value" id="weakPart">--</div><div class="kpi-note" id="weakPartNote">Parte con menor promedio.</div><div class="kpi-badge">Prioridad</div></article>
-        </section>
-
-        <section class="summary-strip">
-          <article class="card insight"><strong>Lectura rápida</strong><span id="quickInsight">Calculando análisis del grupo...</span></article>
-          <article class="card insight"><strong>Fortaleza académica</strong><span id="strengthInsight">Calculando parte con mejor rendimiento...</span></article>
-          <article class="card insight"><strong>Intervención sugerida</strong><span id="improveInsight">Calculando parte crítica...</span></article>
-        </section>
-
-        <section class="charts-grid">
-          <article class="card chart-card"><div class="chart-head"><div><h3>Promedio por parte del examen</h3><p>Comparación del rendimiento promedio en las Partes 1 a 7.</p></div><span class="chart-tag">Barras</span></div><div class="chart-wrap"><canvas id="barChart"></canvas></div></article>
-          <article class="card chart-card"><div class="chart-head"><div><h3>Distribución por nivel MCER</h3><p>Proporción de estudiantes por nivel alcanzado.</p></div><span class="chart-tag">Donut</span></div><div class="chart-wrap"><canvas id="donutChart"></canvas></div></article>
-        </section>
-
-        <section class="charts-grid equal">
-          <article class="card chart-card"><div class="chart-head"><div><h3>Radar integral del salón</h3><p>Perfil promedio en las siete partes evaluadas.</p></div><span class="chart-tag">Radar</span></div><div class="chart-wrap"><canvas id="radarChart"></canvas></div></article>
-          <article class="card chart-card"><div class="chart-head"><div><h3>Distribución de puntajes globales</h3><p>Cantidad de estudiantes por rango de desempeño.</p></div><span class="chart-tag">Histograma</span></div><div class="chart-wrap"><canvas id="histogramChart"></canvas></div></article>
-        </section>
-      </section>
-
-      <section class="view" id="view-competencias">
-        <section class="analysis-grid">
-          <article class="card panel"><h3>Ranking de competencias</h3><div class="list" id="competencyRanking"></div></article>
-          <article class="card panel"><h3>Brecha frente a meta 70</h3><div class="list" id="gapList"></div></article>
-        </section>
-        <section class="charts-grid equal">
-          <article class="card chart-card tall"><div class="chart-head"><div><h3>Promedio y dispersión por parte</h3><p>La línea muestra el promedio. Las barras suaves muestran mínimo y máximo del grupo.</p></div><span class="chart-tag">Mixto</span></div><div class="chart-wrap"><canvas id="rangeChart"></canvas></div></article>
-          <article class="card chart-card tall"><div class="chart-head"><div><h3>Competencia por nivel MCER</h3><p>Compara el promedio de cada parte dentro de cada nivel.</p></div><span class="chart-tag">Barras agrupadas</span></div><div class="chart-wrap"><canvas id="levelPartChart"></canvas></div></article>
-        </section>
-        <section class="summary-strip">
-          <article class="card insight"><strong>Diagnóstico por competencia</strong><span id="competencyDiagnosis"></span></article>
-          <article class="card insight"><strong>Patrón observado</strong><span>Las partes con promedios altos muestran dominio general, pero las partes con alta dispersión indican que algunos estudiantes necesitan refuerzo personalizado.</span></article>
-          <article class="card insight"><strong>Acción recomendada</strong><span>Diseñar actividades por grupos: uno de recuperación para la competencia más baja y otro de profundización para estudiantes B1.</span></article>
-        </section>
-      </section>
-
-      <section class="view" id="view-niveles">
-        <section class="grid-kpis">
-          <article class="card kpi-card"><div class="kpi-label">B1</div><div class="kpi-value" id="b1Count">--</div><div class="kpi-note">Estudiantes con mayor dominio.</div><div class="kpi-badge">Avanzados</div></article>
-          <article class="card kpi-card"><div class="kpi-label">A2</div><div class="kpi-value" id="a2Count">--</div><div class="kpi-note">Grupo intermedio con potencial de subir a B1.</div><div class="kpi-badge">Transición</div></article>
-          <article class="card kpi-card"><div class="kpi-label">A1</div><div class="kpi-value" id="a1Count">--</div><div class="kpi-note">Requieren consolidación de bases.</div><div class="kpi-badge">Refuerzo</div></article>
-          <article class="card kpi-card"><div class="kpi-label">Pre A1</div><div class="kpi-value" id="preA1Count">--</div><div class="kpi-note">Prioridad de acompañamiento.</div><div class="kpi-badge">Crítico</div></article>
-        </section>
-        <section class="charts-grid equal">
-          <article class="card chart-card"><div class="chart-head"><div><h3>Promedio global por nivel</h3><p>Permite comparar el rendimiento medio entre niveles MCER.</p></div><span class="chart-tag">Barras</span></div><div class="chart-wrap"><canvas id="levelAverageChart"></canvas></div></article>
-          <article class="card chart-card"><div class="chart-head"><div><h3>Peso porcentual por nivel</h3><p>Distribución porcentual del salón por nivel.</p></div><span class="chart-tag">Donut</span></div><div class="chart-wrap"><canvas id="levelDonutChart"></canvas></div></article>
-        </section>
-        <section class="card panel"><h3>Lectura por nivel</h3><div class="list" id="levelInsights"></div></section>
-      </section>
-
-      <section class="view" id="view-ranking">
-        <section class="card student-report-trigger">
-          <div>
-            <h3>Reporte individual por estudiante</h3>
-            <p>Abre un buscador central para consultar todos los puntajes, fortalezas, áreas de mejora y análisis individual.</p>
-          </div>
-          <button class="primary-btn" id="openStudentReportBtn">Buscar estudiante</button>
-        </section>
-        <section class="analysis-grid">
-          <article class="card panel"><h3>Top 10 estudiantes</h3><div class="list" id="topStudents"></div></article>
-          <article class="card panel"><h3>Top potencial de mejora</h3><div class="list" id="improvementStudents"></div></article>
-        </section>
-        <section class="card chart-card tall"><div class="chart-head"><div><h3>Ranking completo por puntaje global</h3><p>Visualización horizontal de todos los estudiantes ordenados por desempeño.</p></div><span class="chart-tag">Ranking</span></div><div class="chart-wrap"><canvas id="rankingChart"></canvas></div></section>
-      </section>
-
-      <section class="view" id="view-riesgo">
-        <section class="grid-kpis">
-          <article class="card kpi-card"><div class="kpi-label">Riesgo alto</div><div class="kpi-value" id="highRiskCount">--</div><div class="kpi-note">Global menor a 45.</div><div class="kpi-badge">Prioridad 1</div></article>
-          <article class="card kpi-card"><div class="kpi-label">Riesgo medio</div><div class="kpi-value" id="mediumRiskCount">--</div><div class="kpi-note">Global entre 45 y 59.</div><div class="kpi-badge">Prioridad 2</div></article>
-          <article class="card kpi-card"><div class="kpi-label">En consolidación</div><div class="kpi-value" id="stableCount">--</div><div class="kpi-note">Global entre 60 y 79.</div><div class="kpi-badge">Seguimiento</div></article>
-          <article class="card kpi-card"><div class="kpi-label">Alto desempeño</div><div class="kpi-value" id="excellentCount">--</div><div class="kpi-note">Global igual o superior a 80.</div><div class="kpi-badge">Fortaleza</div></article>
-        </section>
-        <section class="analysis-grid">
-          <article class="card panel"><h3>Estudiantes con riesgo alto</h3><div class="list" id="riskStudents"></div></article>
-          <article class="card panel"><h3>Plan de intervención sugerido</h3><div class="list" id="interventionPlan"></div></article>
-        </section>
-        <section class="card chart-card"><div class="chart-head"><div><h3>Matriz de riesgo por estudiante</h3><p>Cruce entre puntaje global y desempeño en la competencia más baja.</p></div><span class="chart-tag">Dispersión</span></div><div class="chart-wrap"><canvas id="riskScatterChart"></canvas></div></section>
-      </section>
-
-      <section class="view" id="view-datos">
-        <section class="card table-card">
-          <div class="table-toolbar">
-            <div><h3>Base completa de estudiantes</h3><p>Haz clic en los encabezados para ordenar. Usa el buscador para filtrar por nombre o nivel.</p></div>
-            <div class="toolbar-actions">
-              <label class="search" aria-label="Buscar estudiante"><span>⌕</span><input type="search" id="searchInput" placeholder="Buscar estudiante o nivel..." /></label>
-              <select class="select-pill" id="tableLevelFilter" aria-label="Filtrar tabla por nivel"><option value="all">Todos</option></select>
+    <!-- Modal de Registro de Estudiante -->
+    <div id="student-modal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 backdrop-blur-md transition-all duration-500">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 p-6 flex flex-col relative">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center text-2xl font-black mx-auto mb-3 shadow-md">
+                    B1
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">Registro de Estudiante</h2>
+                <p class="text-xs text-slate-500 mt-1">Ingresa tus datos para registrar y certificar tu desempeño en el examen interactivo.</p>
             </div>
-          </div>
-          <div class="table-scroll">
-            <table>
-              <thead><tr><th data-key="estudiante">Estudiante</th><th data-key="global">Global</th><th data-key="nivel">Nivel</th><th data-key="parte1">Parte 1</th><th data-key="parte2">Parte 2</th><th data-key="parte3">Parte 3</th><th data-key="parte4">Parte 4</th><th data-key="parte5">Parte 5</th><th data-key="parte6">Parte 6</th><th data-key="parte7">Parte 7</th></tr></thead>
-              <tbody id="tableBody"></tbody>
-            </table>
-          </div>
-        </section>
-      </section>
-    </main>
-  </div>
+            
+            <form id="student-form" onsubmit="handleRegistration(event)" class="space-y-4">
+                <div>
+                    <label for="student-name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre Completo</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="student-name" required placeholder="Ej. Juan" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm transition">
+                    </div>
+                </div>
 
-  <div class="modal-overlay" id="dataModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">
-          <h3 id="modalTitle">Detalle</h3>
-          <p id="modalSubtitle">Consulta detallada</p>
+                <div>
+                    <label for="student-lastname" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Apellidos</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i class="fa-solid fa-signature"></i>
+                        </span>
+                        <input type="text" id="student-lastname" required placeholder="Ej. Pérez" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm transition">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2 mt-2">
+                    <i class="fa-solid fa-play-circle text-lg"></i> Comenzar Simulación
+                </button>
+            </form>
         </div>
-        <button class="modal-close" id="modalCloseBtn" aria-label="Cerrar modal">×</button>
-      </div>
-      <div class="modal-toolbar" id="modalToolbar">
-        <label class="modal-search" aria-label="Buscar en resultados">
-          <span>⌕</span>
-          <input type="search" id="modalSearchInput" placeholder="Buscar estudiante o nivel..." />
-        </label>
-      </div>
-      <div class="modal-body" id="modalBody"></div>
     </div>
-  </div>
 
-  <script>
-    const students = [
-      { estudiante: 'Keitin Rico', global: 80, nivel: 'B1', parte1: 84, parte2: 90, parte3: 88, parte4: 84, parte5: 70, parte6: 21, parte7: 97 },
-      { estudiante: 'Peter Infante', global: 92, nivel: 'B1', parte1: 100, parte2: 100, parte3: 100, parte4: 95, parte5: 58, parte6: 84, parte7: 97 },
-      { estudiante: 'Valeria Pava', global: 94, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 100, parte5: 93, parte6: 84, parte7: 89 },
-      { estudiante: 'Cristian Garcia', global: 76, nivel: 'B1', parte1: 84, parte2: 75, parte3: 88, parte4: 95, parte5: 93, parte6: 63, parte7: 48 },
-      { estudiante: 'Shailene Chasoy', global: 67, nivel: 'B1', parte1: 100, parte2: 30, parte3: 100, parte4: 84, parte5: 58, parte6: 63, parte7: 48 },
-      { estudiante: 'Isabella Vidal', global: 78, nivel: 'B1', parte1: 100, parte2: 100, parte3: 88, parte4: 63, parte5: 70, parte6: 63, parte7: 73 },
-      { estudiante: 'Zllaron Villalba', global: 67, nivel: 'B1', parte1: 100, parte2: 45, parte3: 100, parte4: 84, parte5: 58, parte6: 63, parte7: 40 },
-      { estudiante: 'Gabriel Tetay', global: 74, nivel: 'B1', parte1: 63, parte2: 100, parte3: 88, parte4: 63, parte5: 70, parte6: 63, parte7: 73 },
-      { estudiante: 'Angelina Orozco', global: 46, nivel: 'A2', parte1: 63, parte2: 75, parte3: 70, parte4: 42, parte5: 70, parte6: 0, parte7: 16 },
-      { estudiante: 'Alejandra Vidal', global: 74, nivel: 'B1', parte1: 63, parte2: 100, parte3: 88, parte4: 63, parte5: 82, parte6: 63, parte7: 65 },
-      { estudiante: 'Yorieth Palmar', global: 63, nivel: 'A2', parte1: 63, parte2: 60, parte3: 88, parte4: 53, parte5: 35, parte6: 63, parte7: 81 },
-      { estudiante: 'Oscar Pinto', global: 52, nivel: 'A2', parte1: 42, parte2: 90, parte3: 88, parte4: 53, parte5: 35, parte6: 63, parte7: 24 },
-      { estudiante: 'Camila Guerra', global: 40, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 11, parte5: 47, parte6: 42, parte7: 48 },
-      { estudiante: 'Aimat Diaz Daza', global: 53, nivel: 'A2', parte1: 100, parte2: 75, parte3: 100, parte4: 42, parte5: 23, parte6: 42, parte7: 32 },
-      { estudiante: 'Samuel Peralta', global: 29, nivel: 'Pre A1', parte1: 0, parte2: 0, parte3: 35, parte4: 42, parte5: 35, parte6: 21, parte7: 40 },
-      { estudiante: 'Eboy Gutierrez', global: 67, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 74, parte5: 58, parte6: 63, parte7: 32 },
-      { estudiante: 'Ulandris Santos', global: 34, nivel: 'A1', parte1: 0, parte2: 60, parte3: 70, parte4: 21, parte5: 23, parte6: 42, parte7: 32 },
-      { estudiante: 'Gabriela Blanco', global: 82, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 74, parte5: 93, parte6: 63, parte7: 73 },
-      { estudiante: 'Ricardo Montiel', global: 88, nivel: 'B1', parte1: 84, parte2: 100, parte3: 88, parte4: 100, parte5: 82, parte6: 21, parte7: 97 },
-      { estudiante: 'Isabela Stor', global: 44, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 21, parte5: 47, parte6: 42, parte7: 57 },
-      { estudiante: 'Daines Castros', global: 44, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 21, parte5: 47, parte6: 42, parte7: 57 },
-      { estudiante: 'Sinais Martinez', global: 63, nivel: 'A2', parte1: 84, parte2: 75, parte3: 70, parte4: 32, parte5: 70, parte6: 63, parte7: 65 },
-      { estudiante: 'Neika Canco', global: 61, nivel: 'A2', parte1: 100, parte2: 90, parte3: 88, parte4: 32, parte5: 58, parte6: 21, parte7: 57 },
-      { estudiante: 'Brissbell Vasquez', global: 42, nivel: 'A1', parte1: 0, parte2: 45, parte3: 88, parte4: 21, parte5: 47, parte6: 42, parte7: 48 },
-      { estudiante: 'Daniel Trillo', global: 80, nivel: 'B1', parte1: 100, parte2: 100, parte3: 88, parte4: 63, parte5: 82, parte6: 63, parte7: 73 },
-      { estudiante: 'Andrywl Londoño', global: 55, nivel: 'A2', parte1: 100, parte2: 45, parte3: 53, parte4: 42, parte5: 47, parte6: 42, parte7: 65 },
-      { estudiante: 'Enrique Solano', global: 48, nivel: 'A1', parte1: 42, parte2: 100, parte3: 70, parte4: 32, parte5: 12, parte6: 42, parte7: 48 },
-      { estudiante: 'Laura Durango', global: 61, nivel: 'A2', parte1: 84, parte2: 90, parte3: 35, parte4: 53, parte5: 70, parte6: 21, parte7: 65 },
-      { estudiante: 'Eyleen Torres', global: 52, nivel: 'A2', parte1: 84, parte2: 45, parte3: 100, parte4: 53, parte5: 47, parte6: 63, parte7: 16 },
-      { estudiante: 'Dilan Arias', global: 50, nivel: 'A2', parte1: 21, parte2: 90, parte3: 0, parte4: 32, parte5: 70, parte6: 21, parte7: 73 },
-      { estudiante: 'Ariadni Fontalvo', global: 46, nivel: 'A2', parte1: 0, parte2: 45, parte3: 88, parte4: 42, parte5: 47, parte6: 42, parte7: 48 },
-      { estudiante: 'Juan Jose Sierra', global: 50, nivel: 'A2', parte1: 21, parte2: 75, parte3: 53, parte4: 53, parte5: 82, parte6: 42, parte7: 24 },
-      { estudiante: 'Samer Lopez', global: 50, nivel: 'A2', parte1: 21, parte2: 100, parte3: 53, parte4: 42, parte5: 0, parte6: 42, parte7: 73 },
-      { estudiante: 'Mateo Gutieres', global: 44, nivel: 'A1', parte1: 84, parte2: 45, parte3: 35, parte4: 32, parte5: 23, parte6: 63, parte7: 48 },
-      { estudiante: 'Keller Peñalver', global: 29, nivel: 'Pre A1', parte1: 0, parte2: 75, parte3: 0, parte4: 11, parte5: 47, parte6: 42, parte7: 24 },
-      { estudiante: 'Maily Martines', global: 65, nivel: 'A2', parte1: 100, parte2: 75, parte3: 53, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
-      { estudiante: 'Riqueth Peñalver', global: 71, nivel: 'B1', parte1: 100, parte2: 75, parte3: 100, parte4: 53, parte5: 35, parte6: 63, parte7: 81 },
-      { estudiante: 'Mariangel Rivera', global: 71, nivel: 'B1', parte1: 63, parte2: 100, parte3: 100, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
-      { estudiante: 'Isabel Sierra', global: 55, nivel: 'A2', parte1: 0, parte2: 75, parte3: 70, parte4: 63, parte5: 58, parte6: 21, parte7: 65 },
-      { estudiante: 'Yoner Vargas', global: 38, nivel: 'A1', parte1: 100, parte2: 15, parte3: 53, parte4: 42, parte5: 23, parte6: 42, parte7: 24 },
-      { estudiante: 'Gianna Oliveros', global: 63, nivel: 'A2', parte1: 63, parte2: 75, parte3: 100, parte4: 53, parte5: 58, parte6: 63, parte7: 48 },
-      { estudiante: 'Abraham Brito', global: 94, nivel: 'B1', parte1: 63, parte2: 100, parte3: 100, parte4: 95, parte5: 100, parte6: 100, parte7: 81 },
-      { estudiante: 'Aura Otero', global: 63, nivel: 'A2', parte1: 100, parte2: 60, parte3: 53, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
-      { estudiante: 'Adonay Ortega', global: 71, nivel: 'B1', parte1: 63, parte2: 100, parte3: 100, parte4: 74, parte5: 58, parte6: 63, parte7: 48 },
-      { estudiante: 'Mariangel Lobo', global: 78, nivel: 'B1', parte1: 84, parte2: 100, parte3: 88, parte4: 63, parte5: 82, parte6: 63, parte7: 73 },
-      { estudiante: 'Jose Angel Pelaez', global: 57, nivel: 'A2', parte1: 21, parte2: 90, parte3: 100, parte4: 84, parte5: 23, parte6: 21, parte7: 48 }
-    ];
+    <!-- Header -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg text-sm tracking-wider">
+                    PARTE 4
+                </div>
+                <div>
+                    <h1 class="text-base md:text-lg font-bold">Simulador Saber 11 • Inglés</h1>
+                    <p class="text-xs text-slate-400">Comprensión de Lectura y Gramática (Nivel B1)</p>
+                </div>
+            </div>
 
-    const partKeys = ['parte1', 'parte2', 'parte3', 'parte4', 'parte5', 'parte6', 'parte7'];
-    const partLabels = ['Parte 1', 'Parte 2', 'Parte 3', 'Parte 4', 'Parte 5', 'Parte 6', 'Parte 7'];
-    const levelOrder = ['Pre A1', 'A1', 'A2', 'B1'];
-    const chartRegistry = {};
-    const metaViews = {
-      dashboard: ['● Dashboard Institucional', 'Análisis de Resultados de Inglés', 'Vista ejecutiva con KPIs, distribución por niveles, rendimiento por partes y lectura general del salón.', 'Lectura ejecutiva', 'KPIs principales, gráficos globales e insights automáticos.'],
-      competencias: ['◎ Vista de Competencias', 'Análisis por Partes del Examen', 'Profundiza en el desempeño de las siete partes, identifica brechas, dispersión y competencias prioritarias.', 'Competencias', 'Aquí se observa en qué parte falla o destaca más el grupo.'],
-      niveles: ['◌ Vista MCER', 'Distribución y Desempeño por Nivel', 'Segmentación por niveles Pre A1, A1, A2 y B1, con promedios e interpretación académica.', 'Niveles MCER', 'Compara grupos y detecta dónde debe enfocarse la intervención.'],
-      ranking: ['★ Vista Ranking', 'Ranking de Estudiantes', 'Clasificación del grupo por puntaje global y detección de estudiantes con mayor potencial de mejora.', 'Ranking', 'Top de estudiantes y oportunidades de avance.'],
-      riesgo: ['! Vista de Riesgo', 'Riesgo Académico e Intervención', 'Identifica estudiantes con bajo desempeño y propone acciones de refuerzo según prioridad.', 'Riesgo académico', 'Lista de estudiantes que necesitan acompañamiento.'],
-      datos: ['▦ Base de Datos', 'Base Completa de Estudiantes', 'Tabla interactiva con búsqueda, filtro por nivel y ordenamiento por columnas.', 'Base de datos', 'Consulta, filtra y ordena la información individual.']
-    };
+            <!-- Controles y opciones -->
+            <div class="flex items-center space-x-3 text-sm flex-wrap">
+                <!-- Identificación del Estudiante Activo -->
+                <div id="student-badge" class="hidden items-center bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 gap-2">
+                    <i class="fa-solid fa-circle-user text-amber-500"></i>
+                    <span id="header-student-name" class="font-bold text-xs truncate max-w-[120px]">Estudiante</span>
+                </div>
 
-    const formatNumber = (value, decimals = 1) => Number(value).toFixed(decimals);
-    const average = values => values.reduce((sum, value) => sum + value, 0) / values.length;
-    const countBy = (items, key) => items.reduce((acc, item) => ((acc[item[key]] = (acc[item[key]] || 0) + 1), acc), {});
-    const pct = (value, total) => `${((value / total) * 100).toFixed(1)}%`;
+                <!-- Selector de Modo -->
+                <div class="bg-slate-800 p-1 rounded-lg flex items-center border border-slate-700">
+                    <button id="btn-mode-sim" onclick="setMode('simulation')" class="px-3 py-1 rounded-md transition font-medium bg-amber-500 text-slate-950">
+                        <i class="fa-solid fa-graduation-cap mr-1"></i> Simulación
+                    </button>
+                    <button id="btn-mode-study" onclick="setMode('study')" class="px-3 py-1 rounded-md transition font-medium text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-book-open mr-1"></i> Estudio
+                    </button>
+                </div>
 
-    const modalState = {
-      type: null,
-      title: '',
-      subtitle: '',
-      rows: [],
-      student: null,
-      metricKey: 'global',
-      metricLabel: 'Puntaje'
-    };
-
-    function getModalElements() {
-      return {
-        overlay: document.getElementById('dataModal'),
-        title: document.getElementById('modalTitle'),
-        subtitle: document.getElementById('modalSubtitle'),
-        body: document.getElementById('modalBody'),
-        search: document.getElementById('modalSearchInput'),
-        toolbar: document.getElementById('modalToolbar')
-      };
-    }
-
-    function openModal({ title, subtitle, rows = [], metricKey = 'global', metricLabel = 'Puntaje', type = 'list', student = null }) {
-      const modal = getModalElements();
-      modalState.type = type;
-      modalState.title = title;
-      modalState.subtitle = subtitle;
-      modalState.rows = rows;
-      modalState.metricKey = metricKey;
-      modalState.metricLabel = metricLabel;
-      modalState.student = student;
-      modal.title.textContent = title;
-      modal.subtitle.textContent = subtitle;
-      modal.search.value = '';
-      modal.toolbar.style.display = type === 'student' ? 'none' : 'flex';
-      modal.overlay.classList.add('open');
-      modal.overlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      if (type === 'student') renderStudentReport(student);
-      else renderModalList(rows, metricKey, metricLabel);
-      setTimeout(() => {
-        if (type !== 'student') modal.search.focus();
-      }, 80);
-    }
-
-    function closeModal() {
-      const modal = getModalElements();
-      modal.overlay.classList.remove('open');
-      modal.overlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    function renderModalList(rows, metricKey, metricLabel) {
-      const modal = getModalElements();
-      const query = modal.search.value.trim().toLowerCase();
-      const filtered = rows.filter(student => student.estudiante.toLowerCase().includes(query) || student.nivel.toLowerCase().includes(query));
-      const values = filtered.map(student => Number(student[metricKey] ?? 0));
-      const avg = values.length ? average(values) : 0;
-      const max = values.length ? Math.max(...values) : 0;
-      const min = values.length ? Math.min(...values) : 0;
-      modal.body.innerHTML = `
-        <section class="modal-stats">
-          <article class="modal-stat"><span>Estudiantes</span><strong>${filtered.length}</strong></article>
-          <article class="modal-stat"><span>Promedio</span><strong>${formatNumber(avg)}</strong></article>
-          <article class="modal-stat"><span>Máximo</span><strong>${max}</strong></article>
-          <article class="modal-stat"><span>Mínimo</span><strong>${min}</strong></article>
-        </section>
-        <div class="modal-table-wrap">
-          <table class="modal-table">
-            <thead>
-              <tr>
-                <th>Estudiante</th>
-                <th>Nivel</th>
-                <th>${metricLabel}</th>
-                <th>Global</th>
-                <th>Mejor parte</th>
-                <th>Área de mejora</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filtered.map(student => {
-                const partScores = partKeys.map((key, index) => ({ key, label: partLabels[index], value: student[key] }));
-                const best = [...partScores].sort((a, b) => b.value - a.value)[0];
-                const weak = [...partScores].sort((a, b) => a.value - b.value)[0];
-                return `<tr class="clickable-list-row" onclick="openStudentReportByName('${student.estudiante.replace(/'/g, "\'")}')">
-                  <td class="student-name">${student.estudiante}</td>
-                  <td><span class="level ${levelClass(student.nivel)}">${student.nivel}</span></td>
-                  <td>${scoreCell(student[metricKey])}</td>
-                  <td>${student.global}</td>
-                  <td>${best.label}: ${best.value}</td>
-                  <td>${weak.label}: ${weak.value}</td>
-                </tr>`;
-              }).join('') || `<tr><td colspan="6" class="empty-state">No hay estudiantes para esta búsqueda.</td></tr>`}
-            </tbody>
-          </table>
+                <!-- Botón de Audio/Silencio -->
+                <button id="btn-audio" onclick="toggleMute()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition" title="Activar/Desactivar sonido">
+                    <i class="fa-solid fa-volume-high" id="audio-icon"></i>
+                </button>
+            </div>
         </div>
-      `;
-    }
+    </header>
 
-    function openStudentsModalByPart(partKey, partLabel) {
-      const rows = [...activeStudents()].sort((a, b) => b[partKey] - a[partKey]);
-      openModal({
-        title: `Detalle de ${partLabel}`,
-        subtitle: `Lista de estudiantes ordenada por puntaje en ${partLabel}. Usa el buscador para filtrar.`,
-        rows,
-        metricKey: partKey,
-        metricLabel: partLabel,
-        type: 'list'
-      });
-    }
-
-    function openStudentsModalByLevel(level) {
-      const rows = activeStudents().filter(student => student.nivel === level).sort((a, b) => b.global - a.global);
-      openModal({
-        title: `Estudiantes en nivel ${level}`,
-        subtitle: `Detalle de estudiantes clasificados en ${level}, ordenados por puntaje global.`,
-        rows,
-        metricKey: 'global',
-        metricLabel: 'Puntaje global',
-        type: 'list'
-      });
-    }
-
-    function openStudentsModalByRange(range) {
-      const rows = activeStudents().filter(student => student.global >= range.min && student.global <= range.max).sort((a, b) => b.global - a.global);
-      openModal({
-        title: `Estudiantes con global ${range.label}`,
-        subtitle: `Detalle de estudiantes cuyo puntaje global está en el rango ${range.label}.`,
-        rows,
-        metricKey: 'global',
-        metricLabel: 'Puntaje global',
-        type: 'list'
-      });
-    }
-
-    function openStudentReportByName(name) {
-      const student = students.find(item => item.estudiante === name);
-      if (!student) return;
-      openModal({
-        title: `Reporte individual`,
-        subtitle: `Análisis completo de ${student.estudiante}.`,
-        type: 'student',
-        student
-      });
-    }
-
-    function renderStudentReport(student) {
-      const modal = getModalElements();
-      const parts = partKeys.map((key, index) => ({ key, label: partLabels[index], value: student[key] }));
-      const best = [...parts].sort((a, b) => b.value - a.value)[0];
-      const weak = [...parts].sort((a, b) => a.value - b.value)[0];
-      const partAverage = average(parts.map(item => item.value));
-      const groupAvg = average(students.map(item => item.global));
-      const levelPeers = students.filter(item => item.nivel === student.nivel);
-      const levelAvg = average(levelPeers.map(item => item.global));
-      const sorted = [...students].sort((a, b) => b.global - a.global);
-      const rank = sorted.findIndex(item => item.estudiante === student.estudiante) + 1;
-      const status = student.global >= 80 ? 'Alto desempeño' : student.global >= 60 ? 'En consolidación' : student.global >= 45 ? 'Riesgo medio' : 'Riesgo alto';
-      const recommendation = student.global >= 80
-        ? 'Mantener actividades de profundización y retos de lectura inferencial.'
-        : student.global >= 60
-          ? `Reforzar ${weak.label} para acercarse a un desempeño alto.`
-          : `Priorizar acompañamiento en ${weak.label} y seguimiento semanal.`;
-
-      modal.body.innerHTML = `
-        <section class="student-report">
-          <div class="report-hero">
-            <div>
-              <h4>${student.estudiante}</h4>
-              <p>Nivel ${student.nivel} · Puesto ${rank} de ${students.length} · Estado: ${status}</p>
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Panel Izquierdo: El Texto de Lectura (Luthiers) -->
+        <section class="w-full lg:w-3/5 flex flex-col gap-4">
+            
+            <!-- Barra de Progreso Superior -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div class="flex-1 mr-4">
+                    <div class="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                        <span>PROGRESO DEL EXAMEN</span>
+                        <span id="progress-text">0 de 8 respondidas</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+                <div id="timer-box" class="flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1.5 rounded-lg font-mono font-bold text-sm">
+                    <i class="fa-solid fa-stopwatch animate-pulse"></i>
+                    <span id="timer">00:00</span>
+                </div>
             </div>
-            <div class="report-score">${student.global}</div>
-          </div>
 
-          <div class="report-grid">
-            <article class="report-card"><span>Promedio partes</span><strong>${formatNumber(partAverage)}</strong></article>
-            <article class="report-card"><span>Mejor competencia</span><strong>${best.label}</strong><span>${best.value} puntos</span></article>
-            <article class="report-card"><span>Área de mejora</span><strong>${weak.label}</strong><span>${weak.value} puntos</span></article>
-            <article class="report-card"><span>Promedio del grupo</span><strong>${formatNumber(groupAvg)}</strong><span>${student.global >= groupAvg ? 'Por encima del grupo' : 'Por debajo del grupo'}</span></article>
-            <article class="report-card"><span>Promedio de su nivel</span><strong>${formatNumber(levelAvg)}</strong><span>${levelPeers.length} estudiantes en ${student.nivel}</span></article>
-            <article class="report-card"><span>Recomendación</span><strong style="font-size:15px;line-height:1.35">${recommendation}</strong></article>
-          </div>
-
-          <div class="card panel" style="box-shadow:none">
-            <h3>Detalle por partes</h3>
-            <div class="part-report-list">
-              ${parts.map(part => `<div class="part-report-row">
-                <strong>${part.label}</strong>
-                <div class="progress-track"><div class="progress-fill" style="width:${part.value}%"></div></div>
-                <span class="metric">${part.value}</span>
-              </div>`).join('')}
+            <!-- Cuadro de Instrucciones del Examen Oficial -->
+            <div class="bg-slate-100 p-4 rounded-xl border-l-4 border-slate-800 text-xs md:text-sm text-slate-700">
+                <p class="font-bold text-slate-900 mb-1">RESPONDA LAS PREGUNTAS 86 A 93 DE ACUERDO CON EL SIGUIENTE TEXTO</p>
+                <p>Lea el texto y seleccione la palabra correcta para cada espacio. En las preguntas 86 - 93, marque A, B o C en su hoja de respuestas. <strong>¡Puedes hacer clic en cualquier palabra en inglés del texto para ver su traducción y ejemplos!</strong></p>
             </div>
-          </div>
+
+            <!-- El Texto del Examen (Estilo Papel) -->
+            <div class="bg-amber-50/20 p-6 md:p-8 rounded-2xl border-2 border-slate-900 shadow-md relative overflow-hidden">
+                <!-- Marca de agua decorativa -->
+                <div class="absolute right-4 top-4 opacity-5 pointer-events-none">
+                    <i class="fa-solid fa-guitar text-9xl"></i>
+                </div>
+
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-300/60 mb-6">
+                    <div>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 exam-text">Luthiers</h2>
+                        <span class="text-xs text-slate-500 font-semibold tracking-wider uppercase block mt-1">Reading Comprehension • Part 4</span>
+                    </div>
+                </div>
+
+                <!-- Cuerpo de texto interactivo con palabras dinamizadas -->
+                <div id="interactive-reading-passage" class="exam-text text-base md:text-lg leading-relaxed text-slate-800 space-y-6">
+                    <p>
+                        A luthier is a person who builds musical instruments and 
+                        <!-- Ejemplo Pre-marcado 0 -->
+                        <span class="inline-flex items-center px-2 py-0.5 bg-slate-200 border border-slate-400 rounded text-slate-800 font-semibold font-mono text-sm mx-1 shadow-sm" title="Ejemplo resuelto">
+                            (0) <span class="text-blue-700 underline decoration-2 underline-offset-2 ml-1">keeps</span>
+                        </span>
+                        them beautiful and useful. They are usually able to work on different instruments; however, they 
+                        <!-- Pregunta 86 -->
+                        <span id="gap-trigger-86" onclick="focusQuestion(86)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (86) <span id="gap-text-86" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        choose instruments that belong to a type, like violins and guitars that are 
+                        <!-- Pregunta 87 -->
+                        <span id="gap-trigger-87" onclick="focusQuestion(87)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (87) <span id="gap-text-87" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        similar.
+                    </p>
+
+                    <p>
+                        They use 
+                        <!-- Pregunta 88 -->
+                        <span id="gap-trigger-88" onclick="focusQuestion(88)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (88) <span id="gap-text-88" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        materials, from wood to metal, and a variety of machines and equipment to cut and put the parts together to make amazing instruments, 
+                        <!-- Pregunta 89 -->
+                        <span id="gap-trigger-89" onclick="focusQuestion(89)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (89) <span id="gap-text-89" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        are played by awesome musicians.
+                    </p>
+
+                    <p>
+                        Sometimes, instruments get 
+                        <!-- Pregunta 90 -->
+                        <span id="gap-trigger-90" onclick="focusQuestion(90)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (90) <span id="gap-text-90" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        because they are old, or they stop working 
+                        <!-- Pregunta 91 -->
+                        <span id="gap-trigger-91" onclick="focusQuestion(91)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (91) <span id="gap-text-91" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        an accident. So, repairing instruments is 
+                        <!-- Pregunta 92 -->
+                        <span id="gap-trigger-92" onclick="focusQuestion(92)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (92) <span id="gap-text-92" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        part of a luthier's job.
+                    </p>
+
+                    <p>
+                        There are some facts you have to know 
+                        <!-- Pregunta 93 -->
+                        <span id="gap-trigger-93" onclick="focusQuestion(93)" class="inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95">
+                            (93) <span id="gap-text-93" class="ml-1 text-slate-400">________</span>
+                        </span>
+                        you'd like to be a luthier: you must be good with your hands and mind details, but the most important thing is to love music.
+                    </p>
+                </div>
+
+                <!-- Sección del Ejemplo visual idéntico al examen -->
+                <div class="mt-8 pt-6 border-t-2 border-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl border border-slate-300">
+                    <div>
+                        <span class="inline-block bg-slate-800 text-white font-bold text-xs px-2.5 py-1 rounded mb-2 tracking-wider">EJEMPLO EN LA HOJA:</span>
+                        <div class="flex items-center gap-4 text-sm font-semibold text-slate-700">
+                            <span class="font-bold text-slate-950">0.</span>
+                            <span class="text-blue-700 font-bold">A. keeps</span>
+                            <span class="opacity-50">B. kept</span>
+                            <span class="opacity-50">C. keeping</span>
+                        </div>
+                    </div>
+                    <!-- Simulador de burbuja de ejemplo del ICFES -->
+                    <div class="flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-300 text-xs">
+                        <span class="font-bold text-slate-500 mr-2">Respuesta:</span>
+                        <span class="font-bold font-mono mr-1">0.</span>
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center font-bold bg-slate-900 text-white border border-slate-950 font-mono">A</span>
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-slate-400 border border-slate-300 font-mono">B</span>
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-slate-400 border border-slate-300 font-mono">C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de control de finalización / Resultados -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-bold text-slate-800">¿Has terminado de responder?</h3>
+                    <p class="text-xs text-slate-500">Haz clic en calificar para guardar tu nota definitiva y ver la retroalimentación.</p>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button id="btn-restart" onclick="restartTest()" class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reiniciar
+                    </button>
+                    <button id="btn-submit" onclick="gradeExam()" class="flex-1 sm:flex-none px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg text-sm shadow-md shadow-blue-500/10 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Calificar Examen
+                    </button>
+                </div>
+            </div>
         </section>
-      `;
-    }
 
-    function openStudentFinderModal() {
-      openModal({
-        title: 'Buscar reporte individual',
-        subtitle: 'Selecciona un estudiante para abrir su reporte detallado de puntajes y análisis.',
-        rows: [...students].sort((a, b) => a.estudiante.localeCompare(b.estudiante, 'es')),
-        metricKey: 'global',
-        metricLabel: 'Puntaje global',
-        type: 'list'
-      });
-    }
+        <!-- Panel Derecho: Hoja de Respuestas y Ayuda Educativa -->
+        <section class="w-full lg:w-2/5 flex flex-col gap-6">
+            
+            <!-- Hoja de Respuestas Digital (Bubble Sheet) -->
+            <div class="bg-white rounded-2xl border-2 border-slate-900 shadow-lg overflow-hidden">
+                <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-amber-500"></i>
+                        <h2 class="font-extrabold tracking-wide text-sm md:text-base">HOJA DE RESPUESTAS</h2>
+                    </div>
+                    <span class="text-xs bg-slate-800 px-2 py-1 rounded font-semibold text-slate-300">Saber 11 Estilo</span>
+                </div>
 
-    function activeStudents() {
-      const level = document.getElementById('levelFilter').value;
-      return level === 'all' ? students : students.filter(student => student.nivel === level);
-    }
+                <div class="p-5 bg-slate-50/50">
+                    <div id="bubble-sheet-container" class="grid grid-cols-1 gap-3">
+                        <!-- Se poblará dinámicamente con JavaScript -->
+                    </div>
+                </div>
+            </div>
 
-    function getPartAverages(rows = activeStudents()) {
-      return partKeys.map((key, index) => ({ key, label: partLabels[index], value: average(rows.map(student => student[key])), min: Math.min(...rows.map(s => s[key])), max: Math.max(...rows.map(s => s[key])) }));
-    }
+            <!-- Explicación Didáctica Flotante o Resultados Finales -->
+            <div id="study-feedback-box" class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col gap-4">
+                <div class="flex items-center justify-between text-blue-800 border-b border-blue-100 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm">Información de Estudio</h4>
+                            <p class="text-xs text-slate-500">Haz clic en cualquier opción para comenzar.</p>
+                        </div>
+                    </div>
+                    <button id="btn-show-all-explanations" onclick="showAllExplanations()" class="hidden text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold px-2.5 py-1 rounded transition">
+                        Ver todas
+                    </button>
+                </div>
+                <div id="explanation-content" class="text-sm text-slate-600 leading-relaxed min-h-[100px] flex items-center justify-center text-center">
+                    <p class="italic text-slate-400">Haz clic en una brecha del texto (ej. 86) o marca una burbuja para ver los detalles de la pregunta y su explicación gramatical aquí.</p>
+                </div>
+            </div>
 
-    function getModeLevel(rows = activeStudents()) {
-      const counts = countBy(rows, 'nivel');
-      return Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || ['-', 0];
-    }
+            <!-- Widget Informativo sobre Luthiers -->
+            <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-15 text-9xl">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <h4 class="font-black tracking-wide text-xs uppercase text-amber-100 mb-1">CULTURA & VOCABULARIO</h4>
+                <h3 class="font-bold text-lg mb-2">¿Qué es un Luthier?</h3>
+                <p class="text-sm text-amber-50/90 leading-relaxed">
+                    Un <strong>luthier</strong> (o laudero) es un artesano experto que construye, restaura y repara instrumentos de cuerda frotada y pulsada, tales como violines, violonchelos, guitarras o contrabajos.
+                </p>
+            </div>
+        </section>
 
-    function destroyChart(id) {
-      if (chartRegistry[id]) chartRegistry[id].destroy();
-    }
+    </main>
 
-    function makeChart(id, config) {
-      const canvas = document.getElementById(id);
-      if (!canvas) return;
-      destroyChart(id);
-      chartRegistry[id] = new Chart(canvas, config);
-    }
+    <!-- Modal de Traducción / Diccionario Interactivo -->
+    <div id="dict-modal" class="fixed inset-0 bg-slate-950/70 z-50 hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 relative flex flex-col">
+            <!-- Cabecera del Diccionario -->
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-language"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold tracking-wide text-lg" id="dict-word-title">Word</h3>
+                        <span class="text-xs text-blue-200 font-semibold uppercase tracking-wider block mt-0.5" id="dict-word-category">Grammar Category</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="speakWord()" class="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition" title="Escuchar pronunciación">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button onclick="toggleDictModal(false)" class="w-8 h-8 rounded-full bg-slate-950/30 hover:bg-slate-950/50 flex items-center justify-center text-white text-xs transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
 
-    function setHeader(view) {
-      const meta = metaViews[view];
-      document.getElementById('viewEyebrow').textContent = meta[0];
-      document.getElementById('viewTitle').textContent = meta[1];
-      document.getElementById('viewDescription').textContent = meta[2];
-      document.getElementById('sidebarTitle').textContent = meta[3];
-      document.getElementById('sidebarHint').textContent = meta[4];
-    }
+            <!-- Cuerpo del Diccionario -->
+            <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <!-- Traducción Principal -->
+                <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                    <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">Traducción Principal</span>
+                    <p class="text-lg font-black text-slate-950" id="dict-word-translation">Traducción</p>
+                </div>
 
-    function setKpis() {
-      const rows = activeStudents();
-      const globalAverage = average(rows.map(student => student.global));
-      const [modeLevel, modeCount] = getModeLevel(rows);
-      const partAverages = getPartAverages(rows);
-      const best = [...partAverages].sort((a, b) => b.value - a.value)[0];
-      const weak = [...partAverages].sort((a, b) => a.value - b.value)[0];
-      document.getElementById('studentCount').textContent = `${rows.length} estudiantes`;
-      document.getElementById('updatedAt').textContent = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
-      document.getElementById('avgGlobal').textContent = formatNumber(globalAverage);
-      document.getElementById('modeLevel').textContent = modeLevel;
-      document.getElementById('modeLevelNote').textContent = `${modeCount} estudiantes se ubican en este nivel dentro del filtro activo.`;
-      document.getElementById('bestPart').textContent = best.label;
-      document.getElementById('bestPartNote').textContent = `Promedio: ${formatNumber(best.value)} puntos.`;
-      document.getElementById('weakPart').textContent = weak.label;
-      document.getElementById('weakPartNote').textContent = `Promedio: ${formatNumber(weak.value)} puntos.`;
-      document.getElementById('quickInsight').textContent = `El promedio global del grupo filtrado es ${formatNumber(globalAverage)} y el nivel predominante es ${modeLevel}.`;
-      document.getElementById('strengthInsight').textContent = `${best.label} lidera con ${formatNumber(best.value)} puntos de promedio; representa la competencia más sólida.`;
-      document.getElementById('improveInsight').textContent = `${weak.label} es la prioridad con ${formatNumber(weak.value)} puntos; requiere refuerzo focalizado.`;
-    }
+                <!-- Contextos y significados -->
+                <div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Significados y Contextos</span>
+                    <div class="space-y-3" id="dict-word-meanings">
+                        <!-- Significado cargado dinámicamente -->
+                    </div>
+                </div>
 
-    function chartDefaults() {
-      Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
-      Chart.defaults.color = '#6b7280';
-    }
+                <!-- Oraciones de Referencia -->
+                <div class="border-t border-slate-100 pt-4">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Oraciones de Referencia (Ejemplos)</span>
+                    <div class="space-y-3" id="dict-word-examples">
+                        <!-- Ejemplos cargados dinámicamente -->
+                    </div>
+                </div>
+            </div>
 
-    function renderDashboardCharts() {
-      const rows = activeStudents();
-      const partAverages = getPartAverages(rows);
-      const levelCounts = countBy(rows, 'nivel');
-      const labels = levelOrder.filter(level => levelCounts[level]);
-      const values = labels.map(level => levelCounts[level]);
-      const minValue = Math.min(...partAverages.map(p => p.value));
+            <!-- Pie del Diccionario -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end">
+                <button onclick="toggleDictModal(false)" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs transition">
+                    Cerrar Diccionario
+                </button>
+            </div>
+        </div>
+    </div>
 
-      makeChart('barChart', { type: 'bar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: partAverages.map(p => p.value === minValue ? '#b1121b' : '#0e3a5b'), borderRadius: 14, borderSkipped: false, barThickness: 38 }] }, options: baseBarOptions('Promedio', index => openStudentsModalByPart(partAverages[index].key, partAverages[index].label)) });
-      makeChart('donutChart', { type: 'doughnut', data: { labels, datasets: [{ data: values, backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5, hoverOffset: 8 }] }, options: donutOptions(index => openStudentsModalByLevel(labels[index])) });
-      makeChart('radarChart', { type: 'radar', data: { labels: partAverages.map(p => p.label), datasets: [{ label: 'Promedio por parte', data: partAverages.map(p => +formatNumber(p.value)), backgroundColor: 'rgba(212,175,55,0.20)', borderColor: '#b1121b', pointBackgroundColor: '#b1121b', pointBorderColor: '#fff', borderWidth: 3 }] }, options: radarOptions() });
-      const ranges = scoreRanges();
-      makeChart('histogramChart', { type: 'bar', data: histogramData(rows), options: baseBarOptions('Estudiantes', index => openStudentsModalByRange(ranges[index])) });
-    }
+    <!-- Modal del Score de Calificación (Mejorado con Certificado de Estudiante) -->
+    <div id="score-modal" class="fixed inset-0 bg-slate-950/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 relative p-6 flex flex-col items-center text-center">
+            
+            <!-- Confeti / Icono de Trofeo -->
+            <div class="w-20 h-20 rounded-full flex items-center justify-center text-white text-4xl shadow-lg mb-4" id="score-icon-bg">
+                <i class="fa-solid fa-trophy" id="score-icon"></i>
+            </div>
 
-    function baseBarOptions(label, onClickHandler = null) {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        onHover: (event, elements) => {
-          event.native.target.style.cursor = elements.length && onClickHandler ? 'pointer' : 'default';
-        },
-        onClick: (event, elements, chart) => {
-          if (!onClickHandler || !elements.length) return;
-          onClickHandler(elements[0].index, chart);
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${label}: ${ctx.raw}` } }
-        },
-        scales: {
-          y: { beginAtZero: true, grid: { color: '#eadfbe' } },
-          x: { grid: { display: false }, ticks: { font: { weight: '800' } } }
+            <h2 class="text-2xl font-black text-slate-900 mb-1" id="score-title">¡Examen Terminado!</h2>
+            
+            <!-- Estampa de Nombre de Estudiante -->
+            <div class="bg-blue-50 text-blue-900 font-bold px-4 py-1.5 rounded-full text-xs mb-6 inline-flex items-center gap-1.5 border border-blue-100">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Estudiante:</span>
+                <span id="score-student-name" class="underline">Nombre del Alumno</span>
+            </div>
+
+            <!-- Círculo de puntuación -->
+            <div class="relative flex items-center justify-center mb-6">
+                <svg class="w-32 h-32 transform -rotate-90">
+                    <circle cx="64" cy="64" r="56" stroke="#f1f5f9" stroke-width="10" fill="transparent" />
+                    <circle cx="64" cy="64" r="56" stroke="#2563eb" stroke-width="10" fill="transparent" 
+                            stroke-dasharray="351.8" id="score-circle-stroke" class="transition-all duration-1000 ease-out" />
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center">
+                    <span class="text-3xl font-black text-slate-900" id="score-ratio">0/8</span>
+                    <span class="text-xs font-bold text-blue-600 uppercase" id="score-percent">0%</span>
+                </div>
+            </div>
+
+            <!-- Clasificación Marco Común Europeo (CEFR) -->
+            <div class="bg-slate-100 w-full p-4 rounded-xl mb-6 text-sm">
+                <span class="text-xs font-bold text-slate-500 block uppercase mb-1">Tu nivel equivalente estimado:</span>
+                <span class="text-xl font-extrabold text-slate-900" id="score-cefr">A1 / Principiante</span>
+                <p class="text-xs text-slate-600 mt-2" id="score-feedback">¡Sigue practicando para mejorar tu gramática de nivel B1!</p>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex gap-3 w-full">
+                <button onclick="toggleScoreModal(false); setMode('study'); showAllExplanations();" class="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl text-sm hover:bg-slate-200 transition">
+                    Ver Explicaciones
+                </button>
+                <button onclick="toggleScoreModal(false); restartTest()" class="flex-1 px-4 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 shadow-md shadow-blue-500/20 transition">
+                    Intentar de Nuevo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer de la aplicación -->
+    <footer class="bg-slate-900 text-slate-500 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p>&copy; 2026 Plataforma Interactiva Saber 11. Diseñado para optimizar la enseñanza de inglés B1.</p>
+            <div class="flex gap-4">
+                <span class="hover:text-slate-400 transition cursor-pointer"><i class="fa-solid fa-circle-question mr-1"></i> Guía de Uso</span>
+                <span class="hover:text-slate-400 transition cursor-pointer"><i class="fa-solid fa-shield-halved mr-1"></i> Políticas</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Diccionario incorporado de toda palabra en inglés del texto "Luthiers"
+        const engDictionary = {
+            "a": {
+                translation: "un / una",
+                category: "article (artículo indefinido)",
+                meanings: [
+                    { context: "Singular", meaning: "Se usa antes de sustantivos singulares que comienzan con sonido de consonante." }
+                ],
+                examples: [
+                    { en: "A luthier is an artisan.", es: "Un luthier es un artesano." }
+                ]
+            },
+            "luthier": {
+                translation: "luthier / laudero",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Oficio", meaning: "Artesano que construye, restaura o repara instrumentos musicales de cuerda frotada o pulsada." }
+                ],
+                examples: [
+                    { en: "He wants to work as a luthier for classical violins.", es: "Él quiere trabajar como luthier para violines clásicos." },
+                    { en: "A luthier must know wood science.", es: "Un luthier debe conocer la ciencia de la madera." }
+                ]
+            },
+            "is": {
+                translation: "es / está",
+                category: "verb (verbo - tercera persona singular de 'to be')",
+                meanings: [
+                    { context: "Identidad", meaning: "Indica la naturaleza, estado o identidad del sujeto." }
+                ],
+                examples: [
+                    { en: "Music is his greatest passion.", es: "La música es su mayor pasión." }
+                ]
+            },
+            "person": {
+                translation: "persona",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Sustantivo singular", meaning: "Un individuo humano." }
+                ],
+                examples: [
+                    { en: "She is a very creative person.", es: "Ella es una persona muy creativa." }
+                ]
+            },
+            "who": {
+                translation: "quien / que",
+                category: "relative pronoun (pronombre relativo)",
+                meanings: [
+                    { context: "Referencia a personas", meaning: "Introduce oraciones relativas sobre personas." }
+                ],
+                examples: [
+                    { en: "The artist who painted this was very talented.", es: "El artista que pintó esto era muy talentoso." }
+                ]
+            },
+            "builds": {
+                translation: "construye",
+                category: "verb (verbo 'build' en presente simple 3ª pers.)",
+                meanings: [
+                    { context: "Creación física", meaning: "Hacer o fabricar cosas mediante la unión de partes." }
+                ],
+                examples: [
+                    { en: "He builds guitars in his backyard.", es: "Él construye guitarras en su patio trasero." }
+                ]
+            },
+            "musical": {
+                translation: "musical",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "General", meaning: "Relacionado con la música o con los instrumentos." }
+                ],
+                examples: [
+                    { en: "They share a rich musical history.", es: "Ellos comparten una rica historia musical." }
+                ]
+            },
+            "instruments": {
+                translation: "instrumentos",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Música", meaning: "Objetos fabricados para producir sonidos musicales armónicos." }
+                ],
+                examples: [
+                    { en: "The acoustic instruments sound beautiful.", es: "Los instrumentos acústicos suenan hermoso." }
+                ]
+            },
+            "and": {
+                translation: "y",
+                category: "conjunction (conjunción)",
+                meanings: [
+                    { context: "Conexión", meaning: "Conecta palabras, oraciones o cláusulas semejantes." }
+                ],
+                examples: [
+                    { en: "Guitars and violins are made of wood.", es: "Las guitarras y los violines están hechos de madera." }
+                ]
+            },
+            "keeps": {
+                translation: "mantiene / conserva",
+                category: "verb (verbo 'keep' en presente simple 3ª pers.)",
+                meanings: [
+                    { context: "Estado", meaning: "Mantener a alguien o algo en un estado, condición o lugar particular." }
+                ],
+                examples: [
+                    { en: "He keeps his tools perfectly clean.", es: "Él mantiene sus herramientas perfectamente limpias." }
+                ]
+            },
+            "them": {
+                translation: "los / las / a ellos / a ellas",
+                category: "pronoun (pronombre de objeto directo)",
+                meanings: [
+                    { context: "Reemplazo", meaning: "Sustituye a un sustantivo plural mencionado previamente." }
+                ],
+                examples: [
+                    { en: "If you have instruments, take care of them.", es: "Si tienes instrumentos, cuida de ellos." }
+                ]
+            },
+            "beautiful": {
+                translation: "hermoso / bello",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Estética", meaning: "Que tiene cualidades que deleitan el sentido de la vista o el oído." }
+                ],
+                examples: [
+                    { en: "She composed a beautiful melody.", es: "Ella compuso una melodía hermosa." }
+                ]
+            },
+            "useful": {
+                translation: "útil / servicial",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Funcionalidad", meaning: "Capaz de ser utilizado con beneficio o para un propósito práctico." }
+                ],
+                examples: [
+                    { en: "This tutorial is very useful.", es: "Este tutorial es muy útil." }
+                ]
+            },
+            "they": {
+                translation: "ellos / ellas",
+                category: "pronoun (pronombre personal sujeto)",
+                meanings: [
+                    { context: "Sujeto plural", meaning: "Se refiere a dos o más personas o cosas ya mencionadas." }
+                ],
+                examples: [
+                    { en: "They work hard every single day.", es: "Ellos trabajan duro cada día." }
+                ]
+            },
+            "are": {
+                translation: "son / están",
+                category: "verb (verbo 'to be' en presente para plural/tú)",
+                meanings: [
+                    { context: "Plural", meaning: "Expresa estado o identidad para 'they', 'we' o 'you'." }
+                ],
+                examples: [
+                    { en: "We are musicians.", es: "Nosotros somos músicos." }
+                ]
+            },
+            "usually": {
+                translation: "usualmente / por lo general",
+                category: "adverb (adverbio de frecuencia)",
+                meanings: [
+                    { context: "Frecuencia", meaning: "De manera habitual o común bajo circunstancias normales." }
+                ],
+                examples: [
+                    { en: "Luthiers usually work in small shops.", es: "Los luthiers usualmente trabajan en talleres pequeños." }
+                ]
+            },
+            "able": {
+                translation: "capaz / hábil",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Habilidad", meaning: "Tener el poder, la destreza o los recursos para hacer algo." }
+                ],
+                examples: [
+                    { en: "I am able to play three instruments.", es: "Soy capaz de tocar tres instrumentos." }
+                ]
+            },
+            "to": {
+                translation: "a / para",
+                category: "preposition (preposición) / infinitivo",
+                meanings: [
+                    { context: "Dirección/Propósito", meaning: "Señala el destino de un movimiento o la meta de una acción; precede a los verbos en infinitivo." }
+                ],
+                examples: [
+                    { en: "We love to listen to music.", es: "Nos encanta escuchar música." }
+                ]
+            },
+            "work": {
+                translation: "trabajar / trabajo",
+                category: "verb / noun (verbo o sustantivo)",
+                meanings: [
+                    { context: "Acción", meaning: "Hacer un esfuerzo físico o mental para conseguir un resultado." },
+                    { context: "Sustantivo", meaning: "El empleo, profesión o la tarea realizada." }
+                ],
+                examples: [
+                    { en: "He loves to work with wood.", es: "A él le encanta trabajar con madera." },
+                    { en: "This is my hard work.", es: "Este es mi duro trabajo." }
+                ]
+            },
+            "on": {
+                translation: "en / sobre",
+                category: "preposition (preposición)",
+                meanings: [
+                    { context: "Contacto/Tema", meaning: "Sobre una superficie física, o relativo a un tema específico." }
+                ],
+                examples: [
+                    { en: "The guitar is on the table.", es: "La guitarra está sobre la mesa." }
+                ]
+            },
+            "different": {
+                translation: "diferente / distinto",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Comparación", meaning: "Que no es igual a otra cosa, singular o variado." }
+                ],
+                examples: [
+                    { en: "They use different techniques.", es: "Ellos usan diferentes técnicas." }
+                ]
+            },
+            "however": {
+                translation: "sin embargo / no obstante",
+                category: "adverb / conjunction (conector adversativo)",
+                meanings: [
+                    { context: "Contraste", meaning: "Introduce una limitación o contrariedad con lo dicho antes." }
+                ],
+                examples: [
+                    { en: "It was raining; however, they came anyway.", es: "Estaba lloviendo; sin embargo, vinieron de todos modos." }
+                ]
+            },
+            "choose": {
+                translation: "elegir / escoger",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Decisión", meaning: "Seleccionar una opción libremente de entre varias." }
+                ],
+                examples: [
+                    { en: "You can choose which guitar you want.", es: "Puedes elegir cuál guitarra quieres." }
+                ]
+            },
+            "that": {
+                translation: "que / eso / ese",
+                category: "relative pronoun / demonstrative (pronombre)",
+                meanings: [
+                    { context: "Pronombre Relativo", meaning: "Conecta cláusulas refiriéndose a un objeto o concepto anterior." }
+                ],
+                examples: [
+                    { en: "The book that you gave me is good.", es: "El libro que me diste es bueno." }
+                ]
+            },
+            "belong": {
+                translation: "pertenecer",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Propiedad/Grupo", meaning: "Ser miembro de un grupo, club, categoría, o propiedad de alguien." }
+                ],
+                examples: [
+                    { en: "These violins belong to the academy.", es: "Estos violines pertenecen a la academia." }
+                ]
+            },
+            "type": {
+                translation: "tipo / clase / teclear",
+                category: "noun / verb (sustantivo o verbo)",
+                meanings: [
+                    { context: "Clasificación", meaning: "Categoría de cosas que comparten rasgos comunes." },
+                    { context: "Computación", meaning: "Escribir usando un teclado." }
+                ],
+                examples: [
+                    { en: "This is a rare type of guitar.", es: "Este es un tipo raro de guitarra." }
+                ]
+            },
+            "like": {
+                translation: "como / gustar / similar a",
+                category: "preposition / verb (preposición o verbo)",
+                meanings: [
+                    { context: "Comparación / Ejemplo", meaning: "Significa 'como' o 'parecido a' cuando introduce ejemplos." },
+                    { context: "Preferencia", meaning: "Tener agrado o preferencia por algo." }
+                ],
+                examples: [
+                    { en: "He plays like a professional.", es: "Él toca como un profesional." },
+                    { en: "I like classical music.", es: "Me gusta la música clásica." }
+                ]
+            },
+            "violins": {
+                translation: "violines",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Instrumento", meaning: "Instrumentos musicales de madera con cuatro cuerdas frotadas por un arco." }
+                ],
+                examples: [
+                    { en: "Violins make a high, sweet sound.", es: "Los violines hacen un sonido agudo y dulce." }
+                ]
+            },
+            "guitars": {
+                translation: "guitarras",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Instrumento", meaning: "Instrumentos de cuerdas, típicamente seis, pulsados con los dedos o púa." }
+                ],
+                examples: [
+                    { en: "He repairs old classical guitars.", es: "Él repara viejas guitarras clásicas." }
+                ]
+            },
+            "similar": {
+                translation: "similar / parecido",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Comparación", meaning: "Que tiene semejanza o características comunes sin ser idéntico." }
+                ],
+                examples: [
+                    { en: "Violas and violins are very similar.", es: "Las violas y los violines son muy similares." }
+                ]
+            },
+            "use": {
+                translation: "utilizan / usan / uso",
+                category: "verb / noun (verbo o sustantivo)",
+                meanings: [
+                    { context: "Acción", meaning: "Emplear un objeto o recurso con un fin concreto." }
+                ],
+                examples: [
+                    { en: "They use high-quality wood.", es: "Ellos usan madera de alta calidad." }
+                ]
+            },
+            "materials": {
+                translation: "materials",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Fabricación", meaning: "Elementos, sustancias o componentes que se necesitan para fabricar un producto." }
+                ],
+                examples: [
+                    { en: "Natural materials are best for acoustics.", es: "Los materiales naturales son mejores para la acústica." }
+                ]
+            },
+            "from": {
+                translation: "de / desde",
+                category: "preposition (preposición)",
+                meanings: [
+                    { context: "Origen / Rango", meaning: "Indica el punto de partida en el espacio, en el tiempo o en una escala." }
+                ],
+                examples: [
+                    { en: "This wood is imported from Italy.", es: "Esta madera es importada de Italia." }
+                ]
+            },
+            "wood": {
+                translation: "madera",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Material", meaning: "Sustancia dura y fibrosa que forma el tronco de los árboles." }
+                ],
+                examples: [
+                    { en: "Fine maple wood is used for violins.", es: "Se usa madera fina de arce para los violines." }
+                ]
+            },
+            "metal": {
+                translation: "metal",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Material", meaning: "Elemento químico de alta densidad, como el bronce o el acero usados en cuerdas de guitarra." }
+                ],
+                examples: [
+                    { en: "Some modern instruments are made of metal.", es: "Algunos instrumentos modernos están hechos de metal." }
+                ]
+            },
+            "variety": {
+                translation: "variedad",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Diverso", meaning: "Conjunto de cosas diversas y distintas entre sí." }
+                ],
+                examples: [
+                    { en: "We have a wide variety of tools.", es: "Tenemos una amplia variedad de herramientas." }
+                ]
+            },
+            "machines": {
+                translation: "máquinas",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Tecnología", meaning: "Aparatos o conjuntos de piezas combinados para recibir energía y realizar un trabajo determinado." }
+                ],
+                examples: [
+                    { en: "Electric machines speed up the cutting process.", es: "Las máquinas eléctricas aceleran el proceso de corte." }
+                ]
+            },
+            "equipment": {
+                translation: "equipo / herramientas",
+                category: "noun (sustantivo incontable)",
+                meanings: [
+                    { context: "General", meaning: "Conjunto de cosas que se necesitan para realizar una actividad o servicio." }
+                ],
+                examples: [
+                    { en: "Our workshop has specialized equipment.", es: "Nuestro taller tiene equipo especializado." }
+                ]
+            },
+            "cut": {
+                translation: "cortar",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Acción", meaning: "Dividir o separar un material con un objeto afilado." }
+                ],
+                examples: [
+                    { en: "You must cut the wood carefully.", es: "Debes cortar la madera con cuidado." }
+                ]
+            },
+            "put": {
+                translation: "poner / ensamblar (en el contexto de 'put together')",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Colocar", meaning: "Mover o colocar algo en una posición específica." },
+                    { context: "Put Together (Fraseal)", meaning: "Armar, unir o ensamblar componentes." }
+                ],
+                examples: [
+                    { en: "They put the parts together with glue.", es: "Ellos unen las partes con pegamento." }
+                ]
+            },
+            "parts": {
+                translation: "partes / piezas",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Componentes", meaning: "Divisiones o piezas individuales que juntas forman un todo." }
+                ],
+                examples: [
+                    { en: "A violin has more than 70 parts.", es: "Un violín tiene más de 70 partes." }
+                ]
+            },
+            "together": {
+                translation: "juntos",
+                category: "adverb (adverbio)",
+                meanings: [
+                    { context: "Unión", meaning: "En compañía de otros o en combinación estrecha con otros elementos." }
+                ],
+                examples: [
+                    { en: "They sing beautiful songs together.", es: "Ellos cantan canciones hermosas juntos." }
+                ]
+            },
+            "make": {
+                translation: "hacer / crear",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Creación", meaning: "Fabricar, confeccionar o construir un objeto a partir de materias primas." }
+                ],
+                examples: [
+                    { en: "These artisans make guitars by hand.", es: "Estos artesanos hacen guitarras a mano." }
+                ]
+            },
+            "amazing": {
+                translation: "increíble / asombroso",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Impresionante", meaning: "Que causa gran admiración, sorpresa o asombro." }
+                ],
+                examples: [
+                    { en: "He plays the cello with amazing control.", es: "Él toca el violonchelo con un control increíble." }
+                ]
+            },
+            "played": {
+                translation: "tocados / interpretados / jugados",
+                category: "verb (participio pasado / pasado simple de 'play')",
+                meanings: [
+                    { context: "Música", meaning: "Hacer sonar un instrumento musical." }
+                ],
+                examples: [
+                    { en: "This piece is played on a violin.", es: "Esta pieza es tocada en un violín." }
+                ]
+            },
+            "by": {
+                translation: "por / cerca de",
+                category: "preposition (preposición)",
+                meanings: [
+                    { context: "Agente (Voz pasiva)", meaning: "Indica quién o qué realiza la acción." }
+                ],
+                examples: [
+                    { en: "The song was composed by Mozart.", es: "La canción fue compuesta por Mozart." }
+                ]
+            },
+            "awesome": {
+                translation: "impresionante / fantástico / genial",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Apreciación", meaning: "Que causa una gran admiración o agrado por ser extraordinario." }
+                ],
+                examples: [
+                    { en: "You did an awesome job today.", es: "Hiciste un trabajo impresionante hoy." }
+                ]
+            },
+            "musicians": {
+                translation: "músicos",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Profesión", meaning: "Personas que componen o interpretan música, especialmente si se dedican a ello profesionalmente." }
+                ],
+                examples: [
+                    { en: "Famous musicians trust this luthier.", es: "Músicos famosos confían en este luthier." }
+                ]
+            },
+            "sometimes": {
+                translation: "a veces / de vez en cuando",
+                category: "adverb (adverbio de frecuencia)",
+                meanings: [
+                    { context: "Frecuencia ocasional", meaning: "En algunas ocasiones pero no de forma constante o regular." }
+                ],
+                examples: [
+                    { en: "Sometimes, we play music in the park.", es: "A veces, tocamos música en el parque." }
+                ]
+            },
+            "get": {
+                translation: "conseguir / ponerse / volverse",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Transición/Cambio de estado", meaning: "Indica un cambio de estado en combinación con un adjetivo o participio (ej. 'get broken' = romperse)." }
+                ],
+                examples: [
+                    { en: "Guitars get broken if they fall.", es: "Las guitarras se rompen si se caen." }
+                ]
+            },
+            "because": {
+                translation: "porque / ya que",
+                category: "conjunction (conjunción subordinante)",
+                meanings: [
+                    { context: "Razón / Causa", meaning: "Introduce la causa o razón de un hecho." }
+                ],
+                examples: [
+                    { en: "He is happy because he passed the exam.", es: "Él está feliz porque pasó el examen." }
+                ]
+            },
+            "old": {
+                translation: "viejo / antiguo",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Edad / Antigüedad", meaning: "Que tiene mucho tiempo de existencia, uso o edad." }
+                ],
+                examples: [
+                    { en: "This old guitar has a warm sound.", es: "Esta guitarra vieja tiene un sonido cálido." }
+                ]
+            },
+            "or": {
+                translation: "o",
+                category: "conjunction (conjunción alternativa)",
+                meanings: [
+                    { context: "Elección", meaning: "Conecta dos o más alternativas u opciones." }
+                ],
+                examples: [
+                    { en: "Do you prefer violins or guitars?", es: "¿Prefieres violines o guitarras?" }
+                ]
+            },
+            "stop": {
+                translation: "detener / dejar de / parar",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Fin de acción", meaning: "Interrumpir una acción o el funcionamiento de algo." }
+                ],
+                examples: [
+                    { en: "They stop playing at midnight.", es: "Ellos dejan de tocar a la medianoche." }
+                ]
+            },
+            "working": {
+                translation: "funcionando / trabajando",
+                category: "verb (gerundio/participio de 'work')",
+                meanings: [
+                    { context: "Funcionamiento", meaning: "Estar en buen estado y operativo (para máquinas o aparatos)." }
+                ],
+                examples: [
+                    { en: "My laptop is working well now.", es: "Mi portátil está funcionando bien ahora." }
+                ]
+            },
+            "accident": {
+                translation: "accidente",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Imprevisto", meaning: "Suceso imprevisto e involuntario que altera el orden de las cosas o causa daños." }
+                ],
+                examples: [
+                    { en: "He broke his violin in a car accident.", es: "Él rompió su violín en un accidente de auto." }
+                ]
+            },
+            "so": {
+                translation: "así que / por lo tanto / tan",
+                category: "conjunction / adverb (conjunción o adverbio)",
+                meanings: [
+                    { context: "Consecuencia", meaning: "Introduce un resultado o consecuencia lógica." }
+                ],
+                examples: [
+                    { en: "It was cold, so I closed the window.", es: "Hacía frío, así que cerré la ventana." }
+                ]
+            },
+            "repairing": {
+                translation: "reparar / la reparación de",
+                category: "noun / verb (gerundio de 'repair' usado como sustantivo)",
+                meanings: [
+                    { context: "Arreglo", meaning: "Acción de arreglar o restaurar algo dañado o roto." }
+                ],
+                examples: [
+                    { en: "Repairing instruments takes patience.", es: "Reparar instrumentos requiere paciencia." }
+                ]
+            },
+            "part": {
+                translation: "parte / porción",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Fracción", meaning: "Cada una de las porciones en que se divide un todo." }
+                ],
+                examples: [
+                    { en: "This is the best part of the song.", es: "Esta es la mejor parte de la canción." }
+                ]
+            },
+            "of": {
+                translation: "de",
+                category: "preposition (preposición)",
+                meanings: [
+                    { context: "Pertenencia", meaning: "Indica pertenencia, origen o de qué material está hecho algo." }
+                ],
+                examples: [
+                    { en: "The sound of strings is clean.", es: "El sonido de las cuerdas es limpio." }
+                ]
+            },
+            "luthier's": {
+                translation: "del luthier",
+                category: "noun with genitive (sustantivo con posesivo sajón)",
+                meanings: [
+                    { context: "Posesión", meaning: "Indica que el objeto subsiguiente pertenece al luthier." }
+                ],
+                examples: [
+                    { en: "A luthier's shop is full of wood.", es: "La tienda de un luthier está llena de madera." }
+                ]
+            },
+            "job": {
+                translation: "trabajo / empleo",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Profesión", meaning: "La ocupación u oficio regular por el que se percibe salario." }
+                ],
+                examples: [
+                    { en: "He applied for a job as a music teacher.", es: "Él postuló a un trabajo como profesor de música." }
+                ]
+            },
+            "there": {
+                translation: "ahí / allí / haber (con verbos 'to be')",
+                category: "adverb / pronoun (adverbio o pronombre)",
+                meanings: [
+                    { context: "Haber (Existencia)", meaning: "Forma 'there are' (hay) para denotar existencia de varios objetos." }
+                ],
+                examples: [
+                    { en: "There are some facts you must know.", es: "Hay algunos hechos que debes conocer." }
+                ]
+            },
+            "some": {
+                translation: "algunos / algunas",
+                category: "determiner / pronoun (determinante indefinido)",
+                meanings: [
+                    { context: "Cantidad vaga", meaning: "Indica una cantidad moderada indefinida de algo contable o incontable." }
+                ],
+                examples: [
+                    { en: "Some violins are extremely expensive.", es: "Algunos violines son extremadamente costosos." }
+                ]
+            },
+            "facts": {
+                translation: "hechos / datos reales",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Realidad", meaning: "Informaciones o acontecimientos reales que se pueden comprobar." }
+                ],
+                examples: [
+                    { en: "Let's review the scientific facts.", es: "Revisemos los hechos científicos." }
+                ]
+            },
+            "you": {
+                translation: "tú / usted / ustedes",
+                category: "pronoun (pronombre personal)",
+                meanings: [
+                    { context: "Segunda persona", meaning: "Se refiere al oyente o lector." }
+                ],
+                examples: [
+                    { en: "You are a brilliant student.", es: "Tú eres un estudiante brillante." }
+                ]
+            },
+            "have": {
+                translation: "tener / haber",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Obligación ('have to')", meaning: "Tener el deber u obligación ineludible de realizar algo." }
+                ],
+                examples: [
+                    { en: "You have to practice every day.", es: "Tienes que practicar todos los días." }
+                ]
+            },
+            "know": {
+                translation: "saber / conocer",
+                category: "verb (verbo)",
+                meanings: [
+                    { context: "Conocimiento", meaning: "Tener información o destreza sobre algo en la mente." }
+                ],
+                examples: [
+                    { en: "Do you know how to tune a guitar?", es: "¿Sabes cómo afinar una guitarra?" }
+                ]
+            },
+            "if": {
+                translation: "si",
+                category: "conjunction (conjunción condicional)",
+                meanings: [
+                    { context: "Condición", meaning: "Introduce la premisa obligatoria para que ocurra un resultado." }
+                ],
+                examples: [
+                    { en: "If you practice, you will succeed.", es: "Si practicas, tendrás éxito." }
+                ]
+            },
+            "you'd": {
+                translation: "te gustaría (contracción de 'you would')",
+                category: "contraction (contracción gramatical)",
+                meanings: [
+                    { context: "Preferencia", meaning: "Contracción de 'you would' para formar el condicional de deseo ('you'd like' = te gustaría)." }
+                ],
+                examples: [
+                    { en: "You'd enjoy playing the cello.", es: "Te gustaría disfrutar tocando el violonchelo." }
+                ]
+            },
+            "would": {
+                translation: "haría (verbo auxiliar condicional)",
+                category: "modal verb (verbo modal)",
+                meanings: [
+                    { context: "Hipótesis", meaning: "Se combina con un infinitivo para expresar situaciones imaginadas o hipotéticas." }
+                ],
+                examples: [
+                    { en: "I would love to visit that luthier.", es: "Me encantaría visitar a ese luthier." }
+                ]
+            },
+            "be": {
+                translation: "ser / estar",
+                category: "verb (verbo infinitivo)",
+                meanings: [
+                    { context: "Infinitivo", meaning: "La forma base pura del verbo 'to be'." }
+                ],
+                examples: [
+                    { en: "I want to be a music professional.", es: "Quiero ser un profesional de la música." }
+                ]
+            },
+            "must": {
+                translation: "deber / tener que (obligación fuerte)",
+                category: "modal verb (verbo modal de obligación)",
+                meanings: [
+                    { context: "Necesidad ineludible", meaning: "Expresa un deber, ley u obligación muy importante generada por el emisor." }
+                ],
+                examples: [
+                    { en: "You must tune the strings before the show.", es: "Debes afinar las cuerdas antes del espectáculo." }
+                ]
+            },
+            "good": {
+                translation: "bueno / hábil",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Habilidad ('good with')", meaning: "Tener destreza para manipular u organizar ciertos objetos o personas." }
+                ],
+                examples: [
+                    { en: "She is very good with kids.", es: "Ella es muy buena con los niños." }
+                ]
+            },
+            "with": {
+                translation: "con",
+                category: "preposition (preposición)",
+                meanings: [
+                    { context: "Compañía / Instrumento", meaning: "Indica asociación, presencia o el recurso físico utilizado." }
+                ],
+                examples: [
+                    { en: "I write with a graphite pencil.", es: "Escribo con un lápiz de grafito." }
+                ]
+            },
+            "your": {
+                translation: "tu / tus / su / sus (de usted)",
+                category: "determiner (adjetivo posesivo)",
+                meanings: [
+                    { context: "Posesión", meaning: "Perteneciente al oyente o asociado directamente con él." }
+                ],
+                examples: [
+                    { en: "Show me your electric guitar.", es: "Muéstrame tu guitarra eléctrica." }
+                ]
+            },
+            "hands": {
+                translation: "manos",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Anatomía", meaning: "Las partes finales de los brazos humanos que sirven para agarrar." }
+                ],
+                examples: [
+                    { en: "Keep your hands warm before playing.", es: "Mantén tus manos calientes antes de tocar." }
+                ]
+            },
+            "mind": {
+                translation: "mente / prestar atención / importar",
+                category: "noun / verb (sustantivo o verbo)",
+                meanings: [
+                    { context: "Intelecto", meaning: "La mente humana." },
+                    { context: "Atención (Verbo)", meaning: "Fijarse, cuidar o prestar mucha atención a los detalles." }
+                ],
+                examples: [
+                    { en: "You must mind the fine details of acoustics.", es: "Debes prestar atención a los finos detalles de la acústica." },
+                    { en: "Do you mind if I play the piano?", es: "¿Te importa si toco el piano?" }
+                ]
+            },
+            "details": {
+                translation: "detalles",
+                category: "noun (sustantivo plural)",
+                meanings: [
+                    { context: "Elementos pequeños", meaning: "Aspectos individuales o minucias que perfeccionan una obra." }
+                ],
+                examples: [
+                    { en: "The details on this violin are exquisite.", es: "Los detalles en este violín son exquisitos." }
+                ]
+            },
+            "but": {
+                translation: "pero / excepto",
+                category: "conjunction (conjunción adversativa)",
+                meanings: [
+                    { context: "Contraste", meaning: "Introduce un concepto que limita o matiza lo anterior." }
+                ],
+                examples: [
+                    { en: "He practices a lot, but he is still nervous.", es: "Él practica mucho, pero aún está nervioso." }
+                ]
+            },
+            "the": {
+                translation: "el / la / los / las",
+                category: "article (artículo definido)",
+                meanings: [
+                    { context: "Específico", meaning: "Se refiere a una persona o cosa que ya es conocida por los interlocutores." }
+                ],
+                examples: [
+                    { en: "The music is playing loud.", es: "La música está sonando fuerte." }
+                ]
+            },
+            "most": {
+                translation: "más / la mayoría de (superlativo)",
+                category: "adverb / determiner (superlativo de grado máximo)",
+                meanings: [
+                    { context: "Superlativo", meaning: "Establece el grado más alto de una cualidad ('the most important' = lo más importante)." }
+                ],
+                examples: [
+                    { en: "This is the most beautiful guitar here.", es: "Esta es la guitarra más hermosa aquí." }
+                ]
+            },
+            "important": {
+                translation: "importante",
+                category: "adjective (adjetivo)",
+                meanings: [
+                    { context: "Relevancia", meaning: "Que tiene gran valor, influencia o trascendencia." }
+                ],
+                examples: [
+                    { en: "It is important to tune your strings regularly.", es: "Es importante afinar las cuerdas regularmente." }
+                ]
+            },
+            "thing": {
+                translation: "cosa / asunto / aspecto",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Entidad abstracta/física", meaning: "Un objeto, circunstancia o elemento que no se nombra específicamente." }
+                ],
+                examples: [
+                    { en: "The most important thing is love for art.", es: "La cosa más importante es el amor por el arte." }
+                ]
+            },
+            "love": {
+                translation: "amar / amor",
+                category: "verb / noun (verbo o sustantivo)",
+                meanings: [
+                    { context: "Afecto", meaning: "Sentir gran afecto, devoción o entusiasmo por algo o alguien." }
+                ],
+                examples: [
+                    { en: "We love classical guitar concerts.", es: "Nos encantan los conciertos de guitarra clásica." }
+                ]
+            },
+            "music": {
+                translation: "música",
+                category: "noun (sustantivo)",
+                meanings: [
+                    { context: "Arte", meaning: "Arte de combinar los sonidos de la voz o de los instrumentos de suerte que produzcan deleite." }
+                ],
+                examples: [
+                    { en: "Music is a universal language.", es: "La música es un lenguaje universal." }
+                ]
+            }
+        };
+
+        // Estado del Examen
+        let userAnswers = {};
+        let currentMode = "simulation"; // 'simulation' o 'study'
+        let examGraded = false;
+        let activeQuestionId = null;
+        let timerInterval = null;
+        let timeElapsed = 0; // segundos
+        let isMuted = false;
+        let studentName = "";
+        let studentLastname = "";
+        let selectedWordForAudio = ""; // Guarda la última palabra cliqueada para reproducir audio
+
+        // Datos de las preguntas Saber 11
+        const questionsData = [
+            {
+                id: 86,
+                options: { A: "often", B: "once", C: "ever" },
+                correct: "A",
+                explanation: "<strong>A. often (Correcta):</strong> Es un adverbio de frecuencia que significa 'a menudo'. Concuerda perfectamente con el tiempo presente simple del texto que describe los hábitos profesionales continuos de los luthiers ('a menudo eligen instrumentos...').<br><br><em>¿Por qué las otras no?</em> 'Once' (una vez) se asocia con el pasado. 'Ever' (alguna vez) se usa para preguntas o negaciones."
+            },
+            {
+                id: 87,
+                options: { A: "enough", B: "over", C: "quite" },
+                correct: "C",
+                explanation: "<strong>C. quite (Correcta):</strong> Es un modificador de grado que significa 'bastante' o 'completamente' ('quite similar' = bastante similares).<br><br><em>¿Por qué las otras no?</em> 'Enough' (suficiente) se coloca después del adjetivo ('similar enough'). 'Over' es una preposición o prefijo y no funciona gramaticalmente para modular el adjetivo 'similar'."
+            },
+            {
+                id: 88,
+                options: { A: "every", B: "several", C: "less" },
+                correct: "B",
+                explanation: "<strong>B. several (Correcta):</strong> Significa 'varios' y se utiliza siempre antes de un sustantivo contable en plural ('several materials').<br><br><em>¿Por qué las otras no?</em> 'Every' (cada) requiere sustantivos en singular ('every material'). 'Less' (menos) se utiliza con sustantivos no contables."
+            },
+            {
+                id: 89,
+                options: { A: "where", B: "which", C: "who" },
+                correct: "B",
+                explanation: "<strong>B. which (Correcta):</strong> Es el pronombre relativo utilizado para hacer referencia a cosas, objetos o animales ('amazing instruments, which are played...' = instrumentos increíbles, los cuales son tocados...).<br><br><em>¿Por qué las otras no?</em> 'Who' se utiliza exclusivamente para personas. 'Where' se utiliza únicamente para referirse a lugares físicos."
+            },
+            {
+                id: 90,
+                options: { A: "break", B: "breaking", C: "broken" },
+                correct: "C",
+                explanation: "<strong>C. broken (Correcta):</strong> La estructura 'get + participio' funciona como una voz pasiva informal que expresa cambio de estado o accidente ('get broken' = romperse). Por ende, requiere el participio pasado 'broken'.<br><br><em>¿Por qué las otras no?</em> 'Break' es el verbo en infinitivo y 'breaking' es el gerundio activo."
+            },
+            {
+                id: 91,
+                options: { A: "after", B: "along", C: "around" },
+                correct: "A",
+                explanation: "<strong>A. after (Correcta):</strong> Es una preposición de tiempo/causa que significa 'después de' o 'a raíz de' ('stop working after an accident' = dejan de funcionar después de un accidente).<br><br><em>¿Por qué las otras no?</em> 'Along' significa 'a lo largo de' y 'around' significa 'alrededor de/cerca de'; ninguna de las dos otorga un sentido lógico de causa/tiempo."
+            },
+            {
+                id: 92,
+                options: { A: "both", B: "either", C: "another" },
+                correct: "C",
+                explanation: "<strong>C. another (Correcta):</strong> Significa 'otro' o 'una parte adicional' de algo singular ('another part' = otra parte de...).<br><br><em>¿Por qué las otras no?</em> 'Both' (ambos) e 'either' (cualquiera de los dos) se utilizan cuando nos referimos a un grupo de exactamente dos opciones."
+            },
+            {
+                id: 93,
+                options: { A: "so", B: "if", C: "while" },
+                correct: "B",
+                explanation: "<strong>B. if (Correcta):</strong> Es la conjunción condicional estándar que introduce la condición de querer ser luthier ('if you'd like to be...' = si te gustaría ser...).<br><br><em>¿Por qué las otras no?</em> 'So' (así que / por lo tanto) expresa una consecuencia. 'While' (mientras) describe simultaneidad de acciones en el tiempo."
+            }
+        ];
+
+        // Captura de datos iniciales del estudiante
+        function handleRegistration(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById("student-name").value.trim();
+            const lastnameInput = document.getElementById("student-lastname").value.trim();
+            
+            if (nameInput === "" || lastnameInput === "") return;
+
+            studentName = nameInput;
+            studentLastname = lastnameInput;
+
+            // Actualizar interfaz del estudiante
+            document.getElementById("header-student-name").textContent = `${studentName} ${studentLastname[0]}.`;
+            document.getElementById("student-badge").classList.remove("hidden");
+            document.getElementById("student-badge").classList.add("flex");
+            document.getElementById("score-student-name").textContent = `${studentName} ${studentLastname}`;
+
+            // Ocultar modal con transición de desvanecimiento
+            const modal = document.getElementById("student-modal");
+            modal.classList.add("opacity-0", "pointer-events-none");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 500);
+
+            // Inicializar la app y arrancar el temporizador
+            playSynthSound(523.25, 0.15, "sine");
+            setTimeout(() => playSynthSound(659.25, 0.2, "sine"), 150);
+            
+            renderBubbleSheet();
+            makePassageClickable();
+            startTimer();
+            updateProgress();
+            focusQuestion(86);
         }
-      };
-    }
 
-    function donutOptions(onClickHandler = null) {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '68%',
-        onHover: (event, elements) => {
-          event.native.target.style.cursor = elements.length && onClickHandler ? 'pointer' : 'default';
-        },
-        onClick: (event, elements, chart) => {
-          if (!onClickHandler || !elements.length) return;
-          onClickHandler(elements[0].index, chart);
-        },
-        plugins: {
-          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { weight: '800' } } },
-          tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} estudiantes (${pct(ctx.raw, ctx.dataset.data.reduce((a,b)=>a+b,0))})` } }
+        // Algoritmo para descomponer de forma segura los nodos de texto y hacer cada palabra clickable
+        function makePassageClickable() {
+            const passageContainer = document.getElementById("interactive-reading-passage");
+            if (!passageContainer) return;
+            
+            processTextNodes(passageContainer);
         }
-      };
-    }
 
-    function radarOptions() {
-      return { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: '800' } } }, tooltip: { backgroundColor: '#101827', padding: 12 } }, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20, backdropColor: 'transparent' }, angleLines: { color: '#e5e7eb' }, grid: { color: '#eadfbe' }, pointLabels: { color: '#0e3a5b', font: { weight: '900', size: 13 } } } } };
-    }
-
-    function scoreRanges() {
-      return [{ label: '0-39', min: 0, max: 39 }, { label: '40-59', min: 40, max: 59 }, { label: '60-79', min: 60, max: 79 }, { label: '80-100', min: 80, max: 100 }];
-    }
-
-    function histogramData(rows) {
-      const ranges = scoreRanges();
-      return { labels: ranges.map(r => r.label), datasets: [{ data: ranges.map(r => rows.filter(s => s.global >= r.min && s.global <= r.max).length), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] };
-    }
-
-    function renderCompetencias() {
-      const rows = activeStudents();
-      const parts = getPartAverages(rows).sort((a, b) => b.value - a.value);
-      const weakest = [...parts].sort((a, b) => a.value - b.value)[0];
-      document.getElementById('competencyRanking').innerHTML = parts.map((p, i) => `<div class="progress-item"><div class="progress-top"><span>${i + 1}. ${p.label}</span><span>${formatNumber(p.value)}</span></div><div class="progress-track"><div class="progress-fill" style="width:${p.value}%"></div></div></div>`).join('');
-      document.getElementById('gapList').innerHTML = parts.map(p => { const gap = p.value - 70; return `<div class="list-row"><div><strong>${p.label}</strong><span>${gap >= 0 ? 'Supera' : 'Está por debajo de'} la meta institucional de 70.</span></div><div class="metric">${gap >= 0 ? '+' : ''}${formatNumber(gap)}</div></div>`; }).join('');
-      document.getElementById('competencyDiagnosis').textContent = `La competencia crítica es ${weakest.label}, con promedio ${formatNumber(weakest.value)}. Se recomienda trabajar ejercicios guiados, retroalimentación inmediata y práctica por niveles.`;
-      makeChart('rangeChart', { type: 'bar', data: { labels: partLabels, datasets: [{ label: 'Máximo', data: partKeys.map(k => Math.max(...rows.map(s => s[k]))), backgroundColor: 'rgba(14,58,91,0.14)', borderRadius: 12 }, { label: 'Promedio', type: 'line', data: getPartAverages(rows).map(p => +formatNumber(p.value)), borderColor: '#b1121b', backgroundColor: '#b1121b', tension: 0.35, borderWidth: 3 }, { label: 'Mínimo', data: partKeys.map(k => Math.min(...rows.map(s => s[k]))), backgroundColor: 'rgba(212,175,55,0.20)', borderRadius: 12 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, x: { grid: { display: false } } } } });
-      makeChart('levelPartChart', { type: 'bar', data: { labels: partLabels, datasets: levelOrder.filter(l => rows.some(s => s.nivel === l)).map((level, idx) => ({ label: level, data: partKeys.map(k => +formatNumber(average(rows.filter(s => s.nivel === level).map(s => s[k])))), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'][idx], borderRadius: 10 })) }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, x: { grid: { display: false } } } } });
-    }
-
-    function renderNiveles() {
-      const rows = activeStudents();
-      const counts = countBy(rows, 'nivel');
-      document.getElementById('b1Count').textContent = counts.B1 || 0;
-      document.getElementById('a2Count').textContent = counts.A2 || 0;
-      document.getElementById('a1Count').textContent = counts.A1 || 0;
-      document.getElementById('preA1Count').textContent = counts['Pre A1'] || 0;
-      const labels = levelOrder.filter(l => rows.some(s => s.nivel === l));
-      makeChart('levelAverageChart', { type: 'bar', data: { labels, datasets: [{ data: labels.map(l => +formatNumber(average(rows.filter(s => s.nivel === l).map(s => s.global)))), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderRadius: 14, borderSkipped: false }] }, options: baseBarOptions('Promedio', index => openStudentsModalByLevel(labels[index])) });
-      makeChart('levelDonutChart', { type: 'doughnut', data: { labels, datasets: [{ data: labels.map(l => counts[l]), backgroundColor: ['#fde2b5', '#fff1cc', '#dbeafe', '#dff5df'], borderColor: '#fff', borderWidth: 5 }] }, options: donutOptions(index => openStudentsModalByLevel(labels[index])) });
-      document.getElementById('levelInsights').innerHTML = labels.map(level => { const group = rows.filter(s => s.nivel === level); const avg = average(group.map(s => s.global)); return `<div class="list-row"><div><strong>${level}</strong><span>${group.length} estudiantes, equivalente al ${pct(group.length, rows.length)} del grupo filtrado.</span></div><div class="metric">${formatNumber(avg)}</div></div>`; }).join('');
-    }
-
-    function renderRanking() {
-      const rows = activeStudents();
-      const sorted = [...rows].sort((a, b) => b.global - a.global);
-      document.getElementById('topStudents').innerHTML = sorted.slice(0, 10).map((s, i) => `<div class="list-row clickable-list-row" onclick="openStudentReportByName('${s.estudiante.replace(/'/g, "\'")}')"><div><strong>${i + 1}. ${s.estudiante}</strong><span>Nivel ${s.nivel} · Clic para ver reporte</span></div><div class="metric">${s.global}</div></div>`).join('');
-      const weakKey = [...getPartAverages(rows)].sort((a, b) => a.value - b.value)[0].key;
-      const potential = rows.map(s => ({ ...s, lowPart: s[weakKey], gap: s.global - s[weakKey] })).sort((a, b) => b.gap - a.gap).slice(0, 10);
-      document.getElementById('improvementStudents').innerHTML = potential.map(s => `<div class="list-row clickable-list-row" onclick="openStudentReportByName('${s.estudiante.replace(/'/g, "\'")}')"><div><strong>${s.estudiante}</strong><span>Brecha entre global y competencia débil: ${s.gap} puntos. Clic para ver reporte.</span></div><div class="metric">${s.lowPart}</div></div>`).join('');
-      makeChart('rankingChart', { type: 'bar', data: { labels: sorted.map(s => s.estudiante), datasets: [{ label: 'Puntaje global', data: sorted.map(s => s.global), backgroundColor: sorted.map(s => s.global >= 80 ? '#1d6f42' : s.global >= 60 ? '#0e3a5b' : s.global >= 45 ? '#b7791f' : '#b1121b'), borderRadius: 10, borderSkipped: false }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, onHover: (event, elements) => { event.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }, onClick: (event, elements) => { if (!elements.length) return; openStudentReportByName(sorted[elements[0].index].estudiante); }, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `Puntaje global: ${ctx.raw}. Clic para reporte individual.` } } }, scales: { x: { beginAtZero: true, max: 100, grid: { color: '#eadfbe' } }, y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 } } } } } });
-    }
-
-    function renderRiesgo() {
-      const rows = activeStudents();
-      const high = rows.filter(s => s.global < 45);
-      const medium = rows.filter(s => s.global >= 45 && s.global < 60);
-      const stable = rows.filter(s => s.global >= 60 && s.global < 80);
-      const excellent = rows.filter(s => s.global >= 80);
-      document.getElementById('highRiskCount').textContent = high.length;
-      document.getElementById('mediumRiskCount').textContent = medium.length;
-      document.getElementById('stableCount').textContent = stable.length;
-      document.getElementById('excellentCount').textContent = excellent.length;
-      document.getElementById('riskStudents').innerHTML = (high.length ? high : medium.slice(0, 8)).sort((a,b)=>a.global-b.global).map(s => `<div class="list-row"><div><strong>${s.estudiante}</strong><span>Nivel ${s.nivel}. Requiere seguimiento por puntaje global bajo.</span></div><div class="metric">${s.global}</div></div>`).join('') || '<div class="empty-state">No hay estudiantes en riesgo dentro del filtro activo.</div>';
-      document.getElementById('interventionPlan').innerHTML = `<div class="list-row"><div><strong>1. Refuerzo focalizado</strong><span>Trabajar la competencia más baja con talleres cortos y evidencias semanales.</span></div><div class="metric">P1</div></div><div class="list-row"><div><strong>2. Tutoría por pares</strong><span>Asignar estudiantes B1 como apoyo en ejercicios guiados.</span></div><div class="metric">P2</div></div><div class="list-row"><div><strong>3. Evaluación formativa</strong><span>Aplicar micropruebas por parte para medir avance.</span></div><div class="metric">P3</div></div>`;
-      const weak = [...getPartAverages(rows)].sort((a,b)=>a.value-b.value)[0];
-      makeChart('riskScatterChart', { type: 'scatter', data: { datasets: [{ label: `Global vs ${weak.label}`, data: rows.map(s => ({ x: s.global, y: s[weak.key], estudiante: s.estudiante, nivel: s.nivel })), backgroundColor: rows.map(s => s.global < 45 ? '#b1121b' : s.global < 60 ? '#d4af37' : '#0e3a5b'), pointRadius: 6, pointHoverRadius: 9 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#101827', padding: 12, callbacks: { label: ctx => `${ctx.raw.estudiante}: Global ${ctx.raw.x}, ${weak.label} ${ctx.raw.y}` } } }, scales: { x: { beginAtZero: true, max: 100, title: { display: true, text: 'Puntaje global' }, grid: { color: '#eadfbe' } }, y: { beginAtZero: true, max: 100, title: { display: true, text: weak.label }, grid: { color: '#eadfbe' } } } } });
-    }
-
-    let currentSort = { key: 'global', direction: 'desc' };
-    function levelClass(level) { return level.toLowerCase().replace(' ', '-'); }
-    function scoreCell(value) { return `<div class="score-bar"><span>${value}</span><div class="mini-track"><div class="mini-fill" style="width:${value}%"></div></div></div>`; }
-    function sortRows(rows) { const { key, direction } = currentSort; const modifier = direction === 'asc' ? 1 : -1; return [...rows].sort((a,b) => typeof a[key] === 'number' ? (a[key]-b[key])*modifier : String(a[key]).localeCompare(String(b[key]), 'es')*modifier); }
-    function filteredTableRows() { const q = document.getElementById('searchInput')?.value.trim().toLowerCase() || ''; const level = document.getElementById('tableLevelFilter')?.value || 'all'; return students.filter(s => (level === 'all' || s.nivel === level) && (s.estudiante.toLowerCase().includes(q) || s.nivel.toLowerCase().includes(q))); }
-    function renderTable() { const body = document.getElementById('tableBody'); if (!body) return; const rows = sortRows(filteredTableRows()); body.innerHTML = rows.map(s => `<tr><td class="student-name">${s.estudiante}</td><td>${scoreCell(s.global)}</td><td><span class="level ${levelClass(s.nivel)}">${s.nivel}</span></td><td>${s.parte1}</td><td>${s.parte2}</td><td>${s.parte3}</td><td>${s.parte4}</td><td>${s.parte5}</td><td>${s.parte6}</td><td>${s.parte7}</td></tr>`).join('') || `<tr><td colspan="10" class="empty-state">No hay resultados para el filtro aplicado.</td></tr>`; }
-
-    function populateFilters() {
-      const counts = countBy(students, 'nivel');
-      ['levelFilter', 'tableLevelFilter'].forEach(id => {
-        const select = document.getElementById(id);
-        if (!select) return;
-        levelOrder.filter(level => counts[level]).forEach(level => {
-          const option = document.createElement('option'); option.value = level; option.textContent = `${level} (${counts[level]})`; select.appendChild(option);
-        });
-      });
-    }
-
-    function renderActiveView() {
-      const view = document.querySelector('.nav-item.active').dataset.view;
-      setKpis();
-      if (view === 'dashboard') renderDashboardCharts();
-      if (view === 'competencias') renderCompetencias();
-      if (view === 'niveles') renderNiveles();
-      if (view === 'ranking') renderRanking();
-      if (view === 'riesgo') renderRiesgo();
-      if (view === 'datos') renderTable();
-    }
-
-    function setupInteractions() {
-      const toggleButton = document.getElementById('toggleSidebar');
-      const app = document.getElementById('app');
-      const sidebar = document.querySelector('.sidebar');
-
-      function isMobileMenu() {
-        return window.matchMedia('(max-width: 900px)').matches;
-      }
-
-      function closeMobileMenu() {
-        sidebar.classList.remove('mobile-open');
-        toggleButton.setAttribute('aria-expanded', 'false');
-        toggleButton.setAttribute('aria-label', 'Abrir menú');
-      }
-
-      toggleButton.addEventListener('click', () => {
-        if (isMobileMenu()) {
-          const isOpen = sidebar.classList.toggle('mobile-open');
-          toggleButton.setAttribute('aria-expanded', String(isOpen));
-          toggleButton.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
-          return;
+        function processTextNodes(node) {
+            // Saltarse elementos interactivos de las brechas (gaps) para no romper el flujo del examen
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.id && node.id.startsWith('gap-')) {
+                    return; // No alterar los botones de respuesta
+                }
+                const children = Array.from(node.childNodes);
+                children.forEach(child => processTextNodes(child));
+            } else if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent;
+                // Expresión regular para separar palabras (incluyendo apóstrofes del genitivo o contracciones)
+                const regex = /([a-zA-Z']+)/g;
+                
+                const parent = node.parentNode;
+                const fragment = document.createDocumentFragment();
+                let lastIndex = 0;
+                let match;
+                
+                while ((match = regex.exec(text)) !== null) {
+                    // Agregar el fragmento de texto no-palabra que esté antes
+                    if (match.index > lastIndex) {
+                        fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+                    }
+                    
+                    const rawWord = match[1];
+                    const cleanWord = rawWord.toLowerCase().replace(/[^a-z']/g, "");
+                    
+                    const span = document.createElement('span');
+                    span.className = 'dict-word';
+                    span.textContent = rawWord;
+                    span.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        lookupWord(cleanWord, rawWord);
+                    });
+                    
+                    fragment.appendChild(span);
+                    lastIndex = regex.lastIndex;
+                }
+                
+                if (lastIndex < text.length) {
+                    fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+                }
+                
+                if (fragment.childNodes.length > 0) {
+                    parent.replaceChild(fragment, node);
+                }
+            }
         }
-        app.classList.toggle('collapsed');
-      });
 
-      window.addEventListener('resize', () => {
-        if (!isMobileMenu()) closeMobileMenu();
-      });
-      document.querySelectorAll('.nav-item').forEach(button => {
-        button.addEventListener('click', () => {
-          document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-          document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-          button.classList.add('active');
-          document.getElementById(`view-${button.dataset.view}`).classList.add('active');
-          setHeader(button.dataset.view);
-          renderActiveView();
-          if (window.matchMedia('(max-width: 900px)').matches) closeMobileMenu();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
-      document.getElementById('levelFilter').addEventListener('change', renderActiveView);
-      document.getElementById('searchInput').addEventListener('input', renderTable);
-      document.getElementById('tableLevelFilter').addEventListener('change', renderTable);
-      document.getElementById('modalSearchInput').addEventListener('input', () => {
-        if (modalState.type === 'list') renderModalList(modalState.rows, modalState.metricKey, modalState.metricLabel);
-      });
-      document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
-      document.getElementById('dataModal').addEventListener('click', event => {
-        if (event.target.id === 'dataModal') closeModal();
-      });
-      document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && document.getElementById('dataModal').classList.contains('open')) closeModal();
-      });
-      document.getElementById('openStudentReportBtn').addEventListener('click', openStudentFinderModal);
-      document.querySelectorAll('th[data-key]').forEach(th => th.addEventListener('click', () => { const key = th.dataset.key; currentSort = currentSort.key === key ? { key, direction: currentSort.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: key === 'estudiante' || key === 'nivel' ? 'asc' : 'desc' }; renderTable(); }));
-    }
+        // Buscar palabra en el diccionario local y mostrar traducción detallada
+        function lookupWord(cleanWord, originalWord) {
+            let data = engDictionary[cleanWord];
 
-    chartDefaults();
-    populateFilters();
-    setHeader('dashboard');
-    setKpis();
-    renderDashboardCharts();
-    renderTable();
-    setupInteractions();
-  </script>
+            // Si es un plural regular acabado en 's' o 'es', intentar buscar su singular
+            if (!data && cleanWord.endsWith('s')) {
+                let singular = cleanWord.slice(0, -1);
+                data = engDictionary[singular];
+                if (!data && cleanWord.endsWith('es')) {
+                    singular = cleanWord.slice(0, -2);
+                    data = engDictionary[singular];
+                }
+            }
+
+            // Datos que se mostrarán en pantalla
+            let wordTitle = originalWord;
+            let wordCategory = "Vocabulario";
+            let wordTranslation = "Traducción no encontrada en el diccionario local.";
+            let wordMeanings = [{ context: "No definido", meaning: "No disponemos de una definición local detallada para esta palabra." }];
+            let wordExamples = [{ en: `We are reading about: ${originalWord}`, es: `Estamos leyendo sobre: ${originalWord}` }];
+
+            if (data) {
+                wordTitle = originalWord;
+                wordCategory = data.category;
+                wordTranslation = data.translation;
+                wordMeanings = data.meanings;
+                wordExamples = data.examples;
+            } else {
+                // Inteligencia de respaldo para palabras comunes no mapeadas
+                wordTranslation = `Palabra: ${originalWord}`;
+                wordCategory = "Palabra de enlace / General";
+            }
+
+            selectedWordForAudio = originalWord;
+
+            // Actualizar elementos del Modal de Traducción
+            document.getElementById("dict-word-title").textContent = wordTitle;
+            document.getElementById("dict-word-category").textContent = wordCategory;
+            document.getElementById("dict-word-translation").textContent = wordTranslation;
+
+            // Renderizar contextos / significados
+            const meaningsBox = document.getElementById("dict-word-meanings");
+            meaningsBox.innerHTML = "";
+            wordMeanings.forEach(m => {
+                const item = document.createElement("div");
+                item.className = "p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs";
+                item.innerHTML = `<strong class="text-indigo-700 block uppercase tracking-wide mb-1">[Contexto: ${m.context}]</strong> <span class="text-slate-700">${m.meaning}</span>`;
+                meaningsBox.appendChild(item);
+            });
+
+            // Renderizar ejemplos
+            const examplesBox = document.getElementById("dict-word-examples");
+            examplesBox.innerHTML = "";
+            wordExamples.forEach(ex => {
+                const item = document.createElement("div");
+                item.className = "space-y-1 text-xs border-l-2 border-amber-500 pl-3 py-1 bg-amber-50/20";
+                item.innerHTML = `
+                    <p class="font-semibold text-slate-800 italic">"${ex.en}"</p>
+                    <p class="text-slate-500">"${ex.es}"</p>
+                `;
+                examplesBox.appendChild(item);
+            });
+
+            // Abrir el modal de diccionario
+            toggleDictModal(true);
+            playSynthSound(880, 0.05, "sine");
+        }
+
+        function toggleDictModal(show) {
+            const modal = document.getElementById("dict-modal");
+            if (show) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                modal.offsetHeight; // Forzar reflujo de renderizado del navegador
+                modal.classList.remove("opacity-0");
+                modal.classList.add("opacity-100");
+            } else {
+                modal.classList.remove("opacity-100");
+                modal.classList.add("opacity-0");
+                setTimeout(() => {
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                }, 300);
+            }
+        }
+
+        // Reproducir audio de pronunciación en inglés nativo usando Web Speech API
+        function speakWord() {
+            if (!selectedWordForAudio) return;
+            try {
+                const utterance = new SpeechSynthesisUtterance(selectedWordForAudio);
+                utterance.lang = "en-US";
+                utterance.rate = 0.85; // Un poco más lento para mejor audibilidad didáctica
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                console.warn("Speech Synthesis no es compatible en este navegador.", e);
+            }
+        }
+
+        // Generación dinámica de la hoja de respuestas
+        function renderBubbleSheet() {
+            const container = document.getElementById("bubble-sheet-container");
+            container.innerHTML = "";
+
+            questionsData.forEach(q => {
+                // Crear fila de pregunta
+                const qRow = document.createElement("div");
+                qRow.id = `bubble-row-${q.id}`;
+                qRow.className = "flex flex-col sm:flex-row lg:flex-row xl:flex-row items-start sm:items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 transition-all duration-200 gap-3";
+                
+                // Prefijo con número
+                const numSpan = document.createElement("div");
+                numSpan.className = "flex items-center gap-2 cursor-pointer";
+                numSpan.onclick = () => focusQuestion(q.id);
+                numSpan.innerHTML = `
+                    <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-700 font-mono text-sm">${q.id}</span>
+                    <span id="bubble-status-${q.id}" class="text-xs font-semibold text-slate-400">Sin responder</span>
+                `;
+                qRow.appendChild(numSpan);
+
+                // Grupo de botones o burbujas de opción
+                const optionsGroup = document.createElement("div");
+                optionsGroup.className = "flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start";
+
+                Object.keys(q.options).forEach(optKey => {
+                    const optVal = q.options[optKey];
+                    
+                    const optBtn = document.createElement("button");
+                    optBtn.id = `bubble-btn-${q.id}-${optKey}`;
+                    optBtn.onclick = () => selectOption(q.id, optKey);
+                    optBtn.className = "bubble-transition flex items-center gap-1 bg-slate-50 border border-slate-300 hover:bg-slate-100 px-3 py-1.5 rounded-lg font-medium text-xs text-slate-700 min-w-[70px] justify-center";
+                    optBtn.innerHTML = `
+                        <span class="w-5 h-5 rounded-full flex items-center justify-center font-bold border border-slate-400 font-mono bg-white text-slate-800 text-[10px]" id="circle-${q.id}-${optKey}">${optKey}</span>
+                        <span class="font-sans">${optVal}</span>
+                    `;
+                    
+                    optionsGroup.appendChild(optBtn);
+                });
+
+                qRow.appendChild(optionsGroup);
+                container.appendChild(qRow);
+            });
+        }
+
+        function selectOption(questionId, optionKey) {
+            if (examGraded && currentMode === 'simulation') return;
+
+            // Guardar respuesta
+            userAnswers[questionId] = optionKey;
+            playSynthSound(300, 0.1, "sine"); // Sonido click
+
+            // Actualizar el texto interactivo del Gap
+            const gapText = document.getElementById(`gap-text-${questionId}`);
+            const gapTrigger = document.getElementById(`gap-trigger-${questionId}`);
+            
+            gapText.textContent = questionsData.find(q => q.id === questionId).options[optionKey];
+            gapText.className = "ml-1 text-blue-900 font-extrabold underline decoration-2 decoration-blue-600";
+            gapTrigger.className = "inline-flex items-center px-2.5 py-1 bg-blue-50 hover:bg-amber-100 border-2 border-blue-500 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm scale-105";
+
+            // Actualizar burbujas en la hoja de respuestas
+            const options = ["A", "B", "C"];
+            options.forEach(opt => {
+                const btn = document.getElementById(`bubble-btn-${questionId}-${opt}`);
+                const circle = document.getElementById(`circle-${questionId}-${opt}`);
+                
+                if (opt === optionKey) {
+                    // Seleccionada
+                    btn.className = "bubble-transition flex items-center gap-1 bg-blue-600 border border-blue-700 px-3 py-1.5 rounded-lg font-bold text-xs text-white min-w-[70px] justify-center shadow-sm";
+                    circle.className = "w-5 h-5 rounded-full flex items-center justify-center font-bold border border-white font-mono bg-white text-blue-700 text-[10px]";
+                } else {
+                    // No seleccionada
+                    btn.className = "bubble-transition flex items-center gap-1 bg-slate-50 border border-slate-300 hover:bg-slate-100 px-3 py-1.5 rounded-lg font-medium text-xs text-slate-700 min-w-[70px] justify-center";
+                    circle.className = "w-5 h-5 rounded-full flex items-center justify-center font-bold border border-slate-400 font-mono bg-white text-slate-800 text-[10px]";
+                }
+            });
+
+            // Actualizar etiqueta de estado de la fila de burbuja
+            document.getElementById(`bubble-status-${questionId}`).textContent = "Respondido";
+            document.getElementById(`bubble-status-${questionId}`).className = "text-xs font-semibold text-blue-600";
+
+            // Si estamos en modo estudio, mostrar retroalimentación directa
+            if (currentMode === "study") {
+                showStudyExplanation(questionId);
+            } else {
+                // En modo simulación, simplemente enfocamos e informamos
+                const qObj = questionsData.find(q => q.id === questionId);
+                const infoBox = document.getElementById("explanation-content");
+                infoBox.className = "text-sm text-slate-700 leading-relaxed";
+                infoBox.innerHTML = `
+                    <div class="w-full flex flex-col gap-2 text-left">
+                        <span class="font-bold text-slate-800">Pregunta ${questionId} seleccionada:</span>
+                        <p class="bg-slate-50 p-3 rounded-lg border border-slate-200">Has elegido la opción <strong class="text-blue-600 font-bold font-mono">${optionKey}. ${qObj.options[optionKey]}</strong>. En el modo de Simulación verás si es correcta al calificar todo el examen.</p>
+                    </div>
+                `;
+            }
+
+            updateProgress();
+        }
+
+        // Foco de elemento para sincronización visual
+        function focusQuestion(questionId) {
+            activeQuestionId = questionId;
+
+            // Quitar brillo a todos los triggers de gap en el texto
+            questionsData.forEach(q => {
+                const tr = document.getElementById(`gap-trigger-${q.id}`);
+                if (tr) tr.classList.remove("ring-4", "ring-blue-400/50");
+                
+                // Quitar color de fila activa en la hoja
+                const row = document.getElementById(`bubble-row-${q.id}`);
+                if (row) row.className = "flex flex-col sm:flex-row lg:flex-row xl:flex-row items-start sm:items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 transition-all duration-200 gap-3";
+            });
+
+            // Iluminar el actual
+            const activeTrigger = document.getElementById(`gap-trigger-${questionId}`);
+            if (activeTrigger) activeTrigger.classList.add("ring-4", "ring-blue-400/50");
+
+            // Iluminar fila de burbujas correspondiente
+            const activeRow = document.getElementById(`bubble-row-${questionId}`);
+            if (activeRow) {
+                activeRow.className = "flex flex-col sm:flex-row lg:flex-row xl:flex-row items-start sm:items-center justify-between p-3 rounded-xl bg-amber-50/50 border-amber-300 shadow-sm transition-all duration-200 gap-3";
+                
+                // Hacer scroll suave en móvil hacia la fila
+                if (window.innerWidth < 1024) {
+                    activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+
+            // Mostrar el estado de la pregunta actual en la caja informativa
+            const qObj = questionsData.find(q => q.id === questionId);
+            const userSel = userAnswers[questionId];
+            const infoBox = document.getElementById("explanation-content");
+            infoBox.className = "text-sm text-slate-700 leading-relaxed";
+
+            if (currentMode === "study" && userSel) {
+                showStudyExplanation(questionId);
+            } else {
+                infoBox.innerHTML = `
+                    <div class="w-full flex flex-col gap-2 text-left">
+                        <span class="font-bold text-slate-800">Editando Pregunta ${questionId}:</span>
+                        <div class="grid grid-cols-3 gap-2 mt-2">
+                            ${Object.keys(qObj.options).map(key => `
+                                <button onclick="selectOption(${questionId}, '${key}')" class="px-3 py-2 border rounded-lg hover:bg-slate-50 text-center font-medium transition ${userSel === key ? 'bg-blue-50 border-blue-400 font-bold text-blue-700' : 'bg-white border-slate-200'}">
+                                    ${key}. ${qObj.options[key]}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Mostrar explicación en modo de estudio inmediato
+        function showStudyExplanation(questionId) {
+            const qObj = questionsData.find(q => q.id === questionId);
+            const userSel = userAnswers[questionId];
+            const isCorrect = userSel === qObj.correct;
+            const infoBox = document.getElementById("explanation-content");
+
+            let statusHeader = "";
+            if (isCorrect) {
+                statusHeader = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-800"><i class="fa-solid fa-circle-check mr-1"></i> ¡CORRECTO!</span>`;
+            } else {
+                statusHeader = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800"><i class="fa-solid fa-circle-xmark mr-1"></i> INCORRECTO</span>`;
+            }
+
+            infoBox.innerHTML = `
+                <div class="w-full flex flex-col gap-2 text-left">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-1">
+                        <span class="font-extrabold text-slate-800">Explicación Gramatical (${questionId})</span>
+                        ${statusHeader}
+                    </div>
+                    <p class="text-xs text-slate-500 mb-2">Tu respuesta: <strong class="text-slate-700">${userSel}. ${qObj.options[userSel]}</strong> | Correcta: <strong class="text-green-700">${qObj.correct}. ${qObj.options[qObj.correct]}</strong></p>
+                    <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-slate-700 leading-relaxed text-xs mb-3">
+                        ${qObj.explanation}
+                    </div>
+                    ${examGraded ? `
+                    <button onclick="showAllExplanations()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-sm border border-slate-200">
+                        <i class="fa-solid fa-layer-group text-slate-500"></i> Ver todas las explicaciones
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Muestra todas las explicaciones al mismo tiempo en el cuadro de estudio lateral
+        function showAllExplanations() {
+            const infoBox = document.getElementById("explanation-content");
+            infoBox.className = "text-sm text-slate-700 leading-relaxed flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar";
+            
+            let htmlContent = `
+                <div class="flex flex-col gap-3 w-full text-left">
+                    <p class="text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Historial de revisión:</p>
+            `;
+
+            questionsData.forEach(q => {
+                const userSel = userAnswers[q.id] || "No respondida";
+                const isCorrect = userSel === q.correct;
+                const statusBadge = isCorrect 
+                    ? `<span class="text-green-600 font-bold text-xs flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-circle-check"></i> Bien</span>`
+                    : `<span class="text-rose-600 font-bold text-xs flex items-center gap-1 bg-rose-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-circle-xmark"></i> Mal</span>`;
+
+                htmlContent += `
+                    <div class="p-3.5 rounded-xl border ${isCorrect ? 'border-green-100 bg-green-50/20 hover:bg-green-50/30' : 'border-rose-100 bg-rose-50/20 hover:bg-rose-50/30'} flex flex-col gap-2 cursor-pointer transition" onclick="focusQuestion(${q.id})">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800 font-mono text-xs">PREGUNTA ${q.id}</span>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            Tu respuesta: <strong class="text-slate-900 font-mono">${userSel} (${q.options[userSel] || 'X'})</strong> 
+                            ${!isCorrect ? `| Correcta: <strong class="text-green-700 font-mono">${q.correct} (${q.options[q.correct]})</strong>` : ''}
+                        </p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200/60 text-xs text-slate-700 mt-1 shadow-sm leading-relaxed">
+                            ${q.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+
+            htmlContent += `</div>`;
+            infoBox.innerHTML = htmlContent;
+
+            // Mostrar botón para volver al menú global
+            document.getElementById("btn-show-all-explanations").classList.add("hidden");
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeElapsed = 0;
+            const timerSpan = document.getElementById("timer");
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                const mins = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
+                const secs = (timeElapsed % 60).toString().padStart(2, '0');
+                timerSpan.textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const total = questionsData.length;
+            const percent = (answeredCount / total) * 100;
+
+            document.getElementById("progress-text").textContent = `${answeredCount} de ${total} respondidas`;
+            const bar = document.getElementById("progress-bar");
+            if (bar) bar.style.width = `${percent}%`;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            playSynthSound(440, 0.1, "triangle");
+
+            const btnSim = document.getElementById("btn-mode-sim");
+            const btnStudy = document.getElementById("btn-mode-study");
+            const btnShowAll = document.getElementById("btn-show-all-explanations");
+
+            if (mode === 'simulation') {
+                btnSim.className = "px-3 py-1 rounded-md transition font-medium bg-amber-500 text-slate-950";
+                btnStudy.className = "px-3 py-1 rounded-md transition font-medium text-slate-300 hover:text-white";
+                btnShowAll.classList.add("hidden");
+                
+                if (!examGraded) {
+                    resetGapsAndBubblesVisuals();
+                }
+            } else {
+                btnStudy.className = "px-3 py-1 rounded-md transition font-medium bg-amber-500 text-slate-950";
+                btnSim.className = "px-3 py-1 rounded-md transition font-medium text-slate-300 hover:text-white";
+                
+                if (examGraded) {
+                    showAllExplanations();
+                } else {
+                    const targetQuestion = activeQuestionId || 86;
+                    focusQuestion(targetQuestion);
+                }
+            }
+        }
+
+        function resetGapsAndBubblesVisuals() {
+            questionsData.forEach(q => {
+                const trigger = document.getElementById(`gap-trigger-${q.id}`);
+                if (!trigger) return;
+                if (userAnswers[q.id]) {
+                    trigger.className = "inline-flex items-center px-2.5 py-1 bg-blue-50 hover:bg-amber-100 border-2 border-blue-500 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm";
+                } else {
+                    trigger.className = "inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm";
+                }
+            });
+        }
+
+        // Calificación final del examen con despliegue de resultados del estudiante
+        function gradeExam() {
+            const unanswered = questionsData.filter(q => !userAnswers[q.id]);
+            
+            if (unanswered.length > 0) {
+                const infoBox = document.getElementById("explanation-content");
+                infoBox.className = "text-sm text-slate-700 leading-relaxed";
+                infoBox.innerHTML = `
+                    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex flex-col gap-2">
+                        <span class="font-bold flex items-center gap-1.5 text-amber-900"><i class="fa-solid fa-triangle-exclamation"></i> Preguntas incompletas</span>
+                        <p>Por favor, responde todas las preguntas del test antes de calificar. Te faltan <strong>${unanswered.length}</strong> espacios por completar.</p>
+                    </div>
+                `;
+                playSynthSound(150, 0.2, "sawtooth");
+                return;
+            }
+
+            // Calcular nota
+            let score = 0;
+            questionsData.forEach(q => {
+                const userSel = userAnswers[q.id];
+                const isCorrect = userSel === q.correct;
+                if (isCorrect) score++;
+
+                // Modificar visuales del Gap según resultado
+                const gapTrigger = document.getElementById(`gap-trigger-${q.id}`);
+                if (gapTrigger) {
+                    if (isCorrect) {
+                        gapTrigger.className = "inline-flex items-center px-2.5 py-1 bg-green-50 border-2 border-green-500 text-green-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm";
+                    } else {
+                        gapTrigger.className = "inline-flex items-center px-2.5 py-1 bg-rose-50 border-2 border-rose-500 text-rose-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm";
+                    }
+                }
+
+                // Ajustar burbujas en la hoja
+                Object.keys(q.options).forEach(opt => {
+                    const btn = document.getElementById(`bubble-btn-${q.id}-${opt}`);
+                    const circle = document.getElementById(`circle-${q.id}-${opt}`);
+                    
+                    if (btn && circle) {
+                        if (opt === q.correct) {
+                            btn.className = "bubble-transition flex items-center gap-1 bg-green-600 border border-green-700 px-3 py-1.5 rounded-lg font-bold text-xs text-white min-w-[70px] justify-center shadow-sm";
+                            circle.className = "w-5 h-5 rounded-full flex items-center justify-center font-bold border border-white font-mono bg-white text-green-700 text-[10px]";
+                        } else if (opt === userSel && !isCorrect) {
+                            btn.className = "bubble-transition flex items-center gap-1 bg-rose-600 border border-rose-700 px-3 py-1.5 rounded-lg font-bold text-xs text-white min-w-[70px] justify-center shadow-sm animate-pulse";
+                            circle.className = "w-5 h-5 rounded-full flex items-center justify-center font-bold border border-white font-mono bg-white text-rose-700 text-[10px]";
+                        }
+                    }
+                });
+            });
+
+            examGraded = true;
+            clearInterval(timerInterval);
+
+            // Calcular Porcentaje y CEFR
+            const percent = Math.round((score / questionsData.length) * 100);
+            let cefr = "A1 (Principiante)";
+            let feedbackText = "Necesitas repasar las bases de gramática y vocabulario de inglés.";
+            let iconBgClass = "bg-rose-500";
+            let iconClass = "fa-solid fa-circle-exclamation";
+
+            if (score === 8) {
+                cefr = "B1+ / B2 Inicial";
+                feedbackText = `¡Excelente trabajo, ${studentName}! Tienes un dominio gramatical perfecto de este texto y un nivel óptimo para pruebas Saber 11.`;
+                iconBgClass = "bg-green-500";
+                iconClass = "fa-solid fa-trophy";
+                playSynthSound(523.25, 0.15, "sine");
+                setTimeout(() => playSynthSound(659.25, 0.15, "sine"), 150);
+                setTimeout(() => playSynthSound(783.99, 0.3, "sine"), 300);
+            } else if (score >= 6) {
+                cefr = "B1 (Intermedio Competente)";
+                feedbackText = `¡Muy bien logrado, ${studentName}! Tu comprensión gramatical es sólida y te encuentras bien preparado para el nivel B1 estándar de la prueba nacional.`;
+                iconBgClass = "bg-blue-500";
+                iconClass = "fa-solid fa-medal";
+                playSynthSound(440, 0.2, "sine");
+                setTimeout(() => playSynthSound(554.37, 0.3, "sine"), 200);
+            } else if (score >= 4) {
+                cefr = "A2 (Plataforma)";
+                feedbackText = `Vas por buen camino, ${studentName}. Sin embargo, te faltan dominar algunas preposiciones, conectores y pronombres clave en este texto.`;
+                iconBgClass = "bg-amber-500";
+                iconClass = "fa-solid fa-star-half-stroke";
+                playSynthSound(330, 0.3, "triangle");
+            } else {
+                feedbackText = `Ánimo, ${studentName}. Repasa el vocabulario dándole clic a las palabras del texto y vuelve a intentarlo para superar el nivel básico.`;
+                playSynthSound(180, 0.4, "sawtooth");
+            }
+
+            // Actualizar Modal de Puntajes
+            document.getElementById("score-ratio").textContent = `${score}/8`;
+            document.getElementById("score-percent").textContent = `${percent}%`;
+            document.getElementById("score-cefr").textContent = cefr;
+            document.getElementById("score-feedback").textContent = feedbackText;
+            
+            const iconBg = document.getElementById("score-icon-bg");
+            iconBg.className = `w-20 h-20 rounded-full flex items-center justify-center text-white text-4xl shadow-lg mb-4 ${iconBgClass}`;
+            document.getElementById("score-icon").className = iconClass;
+
+            // Animar círculo de progreso en el modal
+            const circumference = 351.8; // 2 * pi * r (r=56)
+            const strokeDashoffset = circumference - (percent / 100) * circumference;
+            document.getElementById("score-circle-stroke").style.strokeDashoffset = strokeDashoffset;
+
+            // Abrir Modal de Score de forma segura
+            toggleScoreModal(true);
+
+            // Cambiar a modo estudio de forma amigable para que puedan revisar las explicaciones
+            setMode('study');
+        }
+
+        // Reinicio del Examen
+        function restartTest() {
+            userAnswers = {};
+            examGraded = false;
+            activeQuestionId = null;
+            
+            // Reestablecer gaps del texto
+            questionsData.forEach(q => {
+                const text = document.getElementById(`gap-text-${q.id}`);
+                if (text) {
+                    text.textContent = "________";
+                    text.className = "ml-1 text-slate-400";
+                }
+                
+                const trigger = document.getElementById(`gap-trigger-${q.id}`);
+                if (trigger) {
+                    trigger.className = "inline-flex items-center px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-dashed border-blue-400 text-blue-800 font-bold font-mono text-sm mx-1 rounded-lg cursor-pointer transition shadow-sm hover:scale-105 active:scale-95";
+                }
+            });
+
+            // Reestablecer botón flotante de estudio
+            document.getElementById("btn-show-all-explanations").classList.add("hidden");
+
+            renderBubbleSheet();
+            startTimer();
+            updateProgress();
+            
+            // Restablecer caja informativa
+            const infoBox = document.getElementById("explanation-content");
+            infoBox.className = "text-sm text-slate-600 leading-relaxed min-h-[100px] flex items-center justify-center text-center";
+            infoBox.innerHTML = `
+                <p class="italic text-slate-400">Haz clic en una brecha del texto (ej. 86) o marca una burbuja para ver los detalles de la pregunta y su explicación gramatical aquí.</p>
+            `;
+
+            focusQuestion(86);
+            playSynthSound(600, 0.1, "sine");
+        }
+
+        // Abrir/Cerrar Modal del Historial de Score con transiciones suaves
+        function toggleScoreModal(show) {
+            const modal = document.getElementById("score-modal");
+            if (show) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                modal.offsetHeight; // Forzar reflujo
+                modal.classList.remove("opacity-0");
+                modal.classList.add("opacity-100");
+            } else {
+                modal.classList.remove("opacity-100");
+                modal.classList.add("opacity-0");
+                setTimeout(() => {
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                }, 300);
+            }
+        }
+
+        // Sintetizador de audio nativo mediante Web Audio API para no depender de archivos mp3 externos
+        let audioCtx = null;
+        function playSynthSound(frequency, duration, type = "sine") {
+            if (isMuted) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // volumen bajo agradable
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio not supported yet by interaction requirements", e);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById("audio-icon");
+            const btn = document.getElementById("btn-audio");
+            if (isMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-rose-500";
+                btn.className = "w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-rose-500 transition";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-slate-300";
+                btn.className = "w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-slate-300 transition";
+                playSynthSound(440, 0.1, "sine");
+            }
+        }
+    </script>
 </body>
 </html>
